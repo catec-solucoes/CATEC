@@ -119,9 +119,12 @@ export class OrcamentoModalComponent {
   }
 
   // Validates and stores a selected image or document, clearing it on error.
-  onArquivoSelecionado(event: Event, tipo: TipoAnexo): void {
+  // Images are downscaled/recompressed first — a phone camera photo is
+  // routinely 5-15 MB, which used to get rejected outright (or sent as a
+  // multi-MB base64 payload that struggled on a slow mobile connection).
+  async onArquivoSelecionado(event: Event, tipo: TipoAnexo): Promise<void> {
     const input = event.target as HTMLInputElement;
-    const arquivo = input.files?.[0] ?? null;
+    let arquivo = input.files?.[0] ?? null;
     const arquivoSignal = tipo === 'imagem' ? this.imagemArquivo : this.documentoArquivo;
     const erroSignal = tipo === 'imagem' ? this.imagemErro : this.documentoErro;
 
@@ -129,6 +132,16 @@ export class OrcamentoModalComponent {
       arquivoSignal.set(null);
       erroSignal.set(null);
       return;
+    }
+
+    if (tipo === 'imagem' && arquivo.type.startsWith('image/')) {
+      try {
+        arquivo = await this.comprimirImagem(arquivo);
+      } catch {
+        // Keeps the original file if compression fails for any reason
+        // (unsupported format, canvas unavailable) — the size check below
+        // still guards against sending something too large.
+      }
     }
 
     if (arquivo.size > TAMANHO_MAX_ANEXO_BYTES) {
@@ -140,6 +153,61 @@ export class OrcamentoModalComponent {
 
     arquivoSignal.set(arquivo);
     erroSignal.set(null);
+  }
+
+  // Downscales an image to at most 1600px on its longest side and
+  // re-encodes it as JPEG at 75% quality — a typical phone photo (often
+  // 3000px+ and several MB) comes out well under 1 MB with no visible loss
+  // for an email attachment.
+  private comprimirImagem(arquivo: File): Promise<File> {
+    const TAMANHO_MAX_LADO = 1600;
+    const QUALIDADE_JPEG = 0.75;
+
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(arquivo);
+      const imagem = new Image();
+
+      imagem.onload = () => {
+        URL.revokeObjectURL(url);
+
+        let { width, height } = imagem;
+        if (width > TAMANHO_MAX_LADO || height > TAMANHO_MAX_LADO) {
+          const escala = TAMANHO_MAX_LADO / Math.max(width, height);
+          width = Math.round(width * escala);
+          height = Math.round(height * escala);
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const contexto = canvas.getContext('2d');
+        if (!contexto) {
+          reject(new Error('Não foi possível processar a imagem.'));
+          return;
+        }
+        contexto.drawImage(imagem, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) {
+              reject(new Error('Não foi possível processar a imagem.'));
+              return;
+            }
+            const nome = arquivo.name.replace(/\.\w+$/, '') + '.jpg';
+            resolve(new File([blob], nome, { type: 'image/jpeg' }));
+          },
+          'image/jpeg',
+          QUALIDADE_JPEG,
+        );
+      };
+
+      imagem.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Não foi possível ler a imagem.'));
+      };
+
+      imagem.src = url;
+    });
   }
 
   // Reads a File as a base64 string (without the "data:...;base64," prefix).
