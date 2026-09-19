@@ -34,6 +34,12 @@
     gap: 24px;
     width: max-content;
     animation: sisamb-marquee 25s linear infinite;
+    // iOS Safari has a known history of leaving keyframe animations frozen
+    // on first paint unless the element is promoted to its own compositor
+    // layer — forcing that here, plus the 3D transform below, works around it.
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 
     &:hover {
       animation-play-state: paused;
@@ -67,10 +73,10 @@
 
 @keyframes sisamb-marquee {
   0% {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
   100% {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 

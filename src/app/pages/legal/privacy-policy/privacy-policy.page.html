@@ -1,18 +1,15 @@
 <!-- Logo and back-to-site link -->
 <header class="legal-header">
   <div class="legal-header-container">
-    <a routerLink="/" class="legal-logo">
-      <img
-        src="images/logo-catec-solucoes.webp"
-        alt="CATEC Soluções"
-        class="legal-logo-img"
-      />
+    <a [routerLink]="info.homeRoute" class="legal-logo">
+      <img [src]="info.logoSrc" [alt]="info.logoAlt" class="legal-logo-img" />
     </a>
-    <a routerLink="/" class="legal-back-link">
+    <a [routerLink]="info.homeRoute" class="legal-back-link">
       <i class="fa-solid fa-arrow-left"></i>
       Voltar ao site
     </a>
   </div>
+  <div class="legal-header-accent" [style.background-color]="info.accentColor"></div>
 </header>
 
 <!-- Title and shared legal content -->
@@ -25,4 +22,4 @@
   <app-privacy-content></app-privacy-content>
 </main>
 
-<app-footer theme="catec"></app-footer>
+<app-footer [theme]="marca"></app-footer>

@@ -1,5 +1,9 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withInMemoryScrolling } from '@angular/router';
+import {
+  provideRouter,
+  withComponentInputBinding,
+  withInMemoryScrolling,
+} from '@angular/router';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -11,6 +15,9 @@ export const appConfig: ApplicationConfig = {
         scrollPositionRestoration: 'enabled',
         anchorScrolling: 'enabled',
       }),
+      // Lets route `data` (e.g. { marca: 'sisamb' }) bind straight to a
+      // matching @Input() on the routed component.
+      withComponentInputBinding(),
     ),
   ],
 };

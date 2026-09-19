@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FooterComponent } from '../../../components/footer/footer.component';
+import { FooterComponent, FooterTheme } from '../../../components/footer/footer.component';
+import { LEGAL_MARCA_INFO } from '../legal-marca';
 import { TermsContentComponent } from './terms-content.component';
 
 @Component({
@@ -10,5 +11,14 @@ import { TermsContentComponent } from './terms-content.component';
   templateUrl: './terms-of-use.page.html',
   styleUrl: './terms-of-use.page.scss',
 })
-// Standalone /termos-de-uso page: page chrome around the shared terms content.
-export class TermsOfUsePage {}
+// /termos-de-uso page (and its per-brand variants, e.g.
+// /sisamb/termos-de-uso): page chrome around the shared terms content, with
+// the header logo/link and footer swapped per brand.
+export class TermsOfUsePage {
+  // Bound from the matching route's `data.marca` (see app.routes.ts).
+  @Input() marca: FooterTheme = 'catec';
+
+  get info() {
+    return LEGAL_MARCA_INFO[this.marca];
+  }
+}
