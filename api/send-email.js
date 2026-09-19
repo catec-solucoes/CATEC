@@ -6,7 +6,9 @@ const {
   montarEmailHtml,
 } = require('./_lib/mailer');
 
-const LOGO_CATEC_URL = 'https://catec.vercel.app/images/logo-catec-email.png';
+// Versioned query string busts any stale "failed to fetch" cache that a mail
+// provider's image proxy may have kept from an earlier deploy.
+const LOGO_CATEC_URL = 'https://catec.vercel.app/images/logo-catec-email.png?v=2';
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
