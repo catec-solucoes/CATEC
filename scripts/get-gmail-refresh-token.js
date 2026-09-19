@@ -7,7 +7,12 @@ const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
 
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
-const SCOPES = ['https://mail.google.com/'];
+// Send-only: the backend only ever calls gmail.users.messages.send, so it
+// never needs the full mailbox access of https://mail.google.com/. That
+// broader scope is classified by Google as "restricted", which unverified
+// apps handle far less reliably (more prone to unexpected token revocation)
+// than this narrower "sensitive" scope.
+const SCOPES = ['https://www.googleapis.com/auth/gmail.send'];
 
 const authUrl = oauth2Client.generateAuthUrl({
   access_type: 'offline',

@@ -176,22 +176,6 @@
   }
 }
 
-/* CTA below the ticker */
-.about-cta {
-  display: flex;
-  justify-content: center;
-  // Cancels out the ticker's own padding-bottom so the button doesn't end
-  // up sitting further away than before.
-  margin-top: -24px;
-
-  @media (max-width: 480px) {
-    app-gestao-button {
-      width: 100%;
-      display: block;
-    }
-  }
-}
-
 /* IMAGE AND BADGE COLUMN */
 .about-image-wrapper {
   flex: 1;

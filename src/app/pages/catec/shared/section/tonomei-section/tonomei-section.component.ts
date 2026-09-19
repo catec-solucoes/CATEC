@@ -3,6 +3,10 @@ import {
   afterNextRender,
   Component,
   DestroyRef,
+  ElementRef,
+  QueryList,
+  ViewChildren,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -38,6 +42,8 @@ export class TonomeiSectionComponent {
   private router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
+  @ViewChildren('tabBtn') private tabButtons!: QueryList<ElementRef<HTMLButtonElement>>;
+
   // How often the carousel auto-advances when the user isn't interacting with it.
   private static readonly AUTOPLAY_INTERVAL_MS = 15000;
   private autoplayId: ReturnType<typeof setInterval> | null = null;
@@ -46,6 +52,18 @@ export class TonomeiSectionComponent {
     afterNextRender(() => {
       this.restartAutoplay();
       this.destroyRef.onDestroy(() => this.stopAutoplay());
+    });
+
+    // Keeps the active tab scrolled into view on mobile, where the tab strip
+    // scrolls horizontally and autoplay/arrow navigation could otherwise
+    // advance the slide without the tab bar visibly following along.
+    effect(() => {
+      const index = this.activeSlideIndex();
+      this.tabButtons?.get(index)?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'nearest',
+        block: 'nearest',
+      });
     });
   }
 

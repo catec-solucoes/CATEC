@@ -220,10 +220,10 @@
   position: absolute;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   background: #ffffff;
   border-radius: 16px;
-  padding: 8px 10px;
+  padding: 12px 16px;
   box-shadow: 0 14px 30px -12px rgba(42, 47, 53, 0.18);
   animation:
     hero-fade-in 0.6s ease both,
@@ -247,6 +247,7 @@
     display: flex;
     flex-direction: column;
     line-height: 1.2;
+    white-space: nowrap;
   }
 
   .fc-label {
@@ -256,104 +257,82 @@
   }
 
   .fc-value {
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-size: 1.15rem;
+    font-weight: 800;
     color: var(--secondary-sisamb);
-  }
-
-  .fc-trend {
-    font-size: 0.65rem;
-    color: var(--primary-sisamb-text);
-    font-weight: 600;
   }
 
   &:hover {
     animation-play-state: paused;
     box-shadow: 0 18px 36px -12px rgba(42, 47, 53, 0.24);
   }
-}
 
-/* Card Esquerdo Superior (Processos Digitais) - Posição Web nos X e segura no mobile */
-.fc-digital {
-  top: 18%;
-  left: -12%;
-  animation-delay: 0.35s, 0s;
-
+  // Below this point the two-column layout has already stacked, so cards
+  // sit closer to the circle's edge and need to shrink to match.
   @media (max-width: 900px) {
-    top: 4%;
-    left: 2%;
-    padding: 10px 14px;
+    gap: 8px;
+
+    .fc-value {
+      font-size: 0.95rem;
+    }
   }
 
   @media (max-width: 640px) {
-    top: 2%;
-    left: 0%;
-    transform: scale(0.9);
+    gap: 6px;
+
+    .fc-icon {
+      width: 28px;
+      height: 28px;
+      font-size: 0.95rem;
+    }
+
+    .fc-label {
+      font-size: 0.6rem;
+    }
+
+    .fc-value {
+      font-size: 0.85rem;
+    }
   }
 }
 
-/* Card Esquerdo Inferior (Mais Agilidade) */
+.fc-digital {
+  top: 6%;
+  left: -8%;
+  animation-delay: 0.35s, 0s;
+
+  @media (max-width: 640px) {
+    top: 2%;
+  }
+}
+
 .fc-speed {
-  bottom: 12%;
+  bottom: 20%;
   left: -12%;
   animation-delay: 0.5s, 0.8s;
 
-  @media (max-width: 900px) {
-    bottom: 8%;
-    left: -4%;
-    padding: 8px 12px;
-  }
-
   @media (max-width: 640px) {
-    bottom: 4%;
-    left: -2%;
-    transform: scale(0.9);
+    bottom: 22%;
   }
 }
 
-/* Card Direito Inferior (Atendimento) */
 .fc-support {
-  bottom: 12%;
-  right: -12%;
+  bottom: 4%;
+  right: -6%;
   animation-delay: 0.65s, 0.4s;
 
-  @media (max-width: 900px) {
-    bottom: 8%;
-    right: -4%;
-    padding: 8px 12px;
-  }
-
   @media (max-width: 640px) {
-    bottom: 4%;
-    right: -2%;
-    transform: scale(0.9);
+    bottom: 0%;
   }
 }
 
-/* Card Direito Superior (Análise Inteligente) - Posição Web ajustada para baixar */
 .fc-ai {
-  top: 18%;
-  right: -8%;
-  max-width: 210px;
-  .fc-value { white-space: nowrap; }
+  top: 14%;
+  right: -10%;
   animation-delay: 0.8s, 1.2s;
 
-  @media (max-width: 1024px) {
-    top: 15%;
-    right: -4%;
-  }
-
-  @media (max-width: 900px) {
-    top: 4%;
-    right: 2%;
-    padding: 8px 12px;
-    max-width: 180px;
-  }
-
   @media (max-width: 640px) {
-    top: 2%;
-    right: -2%;
-    transform: scale(0.9);
+    top: 16%;
   }
 }
 

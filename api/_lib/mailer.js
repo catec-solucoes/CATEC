@@ -83,4 +83,118 @@ function escapeHtml(value) {
     .replace(/"/g, '&quot;');
 }
 
-module.exports = { enviarEmail, isValidEmail, paraAnexoNodemailer, escapeHtml };
+// Plain-text fallback for the quote-request notification, shown by clients
+// that don't render HTML email.
+function montarTextoPlano(campos) {
+  return [
+    ['Nome', campos.name],
+    ['Documento', campos.document],
+    ['Endereço', campos.address],
+    ['E-mail', campos.email],
+    ['Telefone', campos.phone],
+    ['Data agendada', campos.preferredDate],
+    ['Hora agendada', campos.preferredTime],
+    ['Descrição', campos.description],
+  ]
+    .filter(([, valor]) => valor)
+    .map(([campo, valor]) => `${campo}: ${valor}`)
+    .join('\n');
+}
+
+// Shared HTML body for the quote-request notification emails. Each brand
+// (catec, SISAMB, Gestão Una) passes its own logo and colors; the layout,
+// field handling and attachment/footer notes stay identical so a fix here
+// applies everywhere at once.
+function montarEmailHtml({
+  logoUrl,
+  logoAlt,
+  logoLargura,
+  logoAltura,
+  corPrimaria,
+  corEscura,
+  corFundoSuave,
+  corFundoTopo = '#ffffff',
+  corTextoTopo = '#64748b',
+  subtitulo,
+  siteUrl,
+  campos: { name, document, address, email, phone, preferredDate, preferredTime, description },
+  temAnexo,
+}) {
+  const linha = (rotulo, valor) =>
+    valor
+      ? `<tr><td style="padding: 6px 0; color: ${corEscura}; font-size: 14px;"><strong>${rotulo}:</strong> ${escapeHtml(valor)}</td></tr>`
+      : '';
+
+  // Catec's header keeps its original dark background; SISAMB and Gestão
+  // Una use a white header with a colored accent border instead.
+  const estiloTopo =
+    corFundoTopo === '#ffffff'
+      ? `background-color: #ffffff; border-bottom: 3px solid ${corPrimaria};`
+      : `background-color: ${corFundoTopo};`;
+
+  return `
+    <div style="max-width: 520px; margin: 0 auto; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; border: 1px solid #e2e2e2; border-radius: 12px; overflow: hidden;">
+      <div style="${estiloTopo} padding: 20px 24px;">
+        <img
+          src="${logoUrl}"
+          alt="${escapeHtml(logoAlt)}"
+          width="${logoLargura}"
+          height="${logoAltura}"
+          style="display: block; width: ${logoLargura}px; height: ${logoAltura}px; margin: 0 0 8px;"
+        />
+        <p style="margin: 0; font-size: 13px; color: ${corTextoTopo};">${subtitulo}</p>
+      </div>
+
+      <div style="padding: 24px; background-color: #ffffff;">
+        <p style="margin: 0 0 16px; font-size: 14px; color: #333333;">
+          ${subtitulo}, enviado por <strong>${escapeHtml(name)}</strong>.
+        </p>
+
+        <div style="background-color: ${corFundoSuave}; border-radius: 10px; padding: 16px; margin-bottom: 16px;">
+          <div style="font-weight: 700; font-size: 15px; color: ${corEscura}; margin-bottom: 4px;">${escapeHtml(name)}</div>
+          ${document ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Documento: ${escapeHtml(document)}</div>` : ''}
+
+          <table style="width: 100%; border-collapse: collapse;">
+            ${linha('Endereço', address)}
+            ${linha('E-mail', email)}
+            ${linha('Telefone', phone)}
+            ${linha('Data agendada', preferredDate)}
+            ${linha('Hora agendada', preferredTime)}
+          </table>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 8px; font-size: 14px; font-weight: 700; color: ${corEscura};">Descrição</p>
+          <div style="background-color: ${corFundoSuave}; border-left: 3px solid ${corPrimaria}; padding: 12px 16px; font-size: 14px; line-height: 1.6; text-align: left; color: #333333; border-radius: 0 6px 6px 0; white-space: pre-wrap;">
+            ${escapeHtml(description)}
+          </div>
+        </div>
+
+        ${
+          temAnexo
+            ? `<p style="margin: 16px 0 0; font-size: 13px; color: ${corEscura};">📎 Este e-mail inclui anexo(s) enviado(s) pelo formulário.</p>`
+            : ''
+        }
+      </div>
+
+      <div style="background-color: #f8fafc; padding: 14px 24px; text-align: center;">
+        <p style="margin: 0; font-size: 12px; color: #94a3b8;">
+          Enviado automaticamente pelo formulário do site${
+            siteUrl
+              ? ` — <a href="${siteUrl}" style="color: ${corPrimaria}; text-decoration: none;">${siteUrl.replace(/^https?:\/\//, '')}</a>`
+              : ''
+          }
+        </p>
+      </div>
+    </div>
+  `;
+}
+
+module.exports = {
+  enviarEmail,
+  isValidEmail,
+  paraAnexoNodemailer,
+  escapeHtml,
+  montarTextoPlano,
+  montarEmailHtml,
+};

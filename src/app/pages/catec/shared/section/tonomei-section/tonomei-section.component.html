@@ -23,6 +23,7 @@
       <div class="carousel-tabs">
         @for (slide of slides; track slide.id; let i = $index) {
           <button
+            #tabBtn
             class="tab-btn"
             [class.active]="activeSlideIndex() === i"
             (click)="setActiveSlide(i)"

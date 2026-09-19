@@ -59,9 +59,17 @@ export class OrcamentoModalComponent {
     });
   }
 
-  // Closes the modal.
+  // Closes the modal and clears the form, so reopening it always starts fresh.
   fechar(): void {
     this.orcamentoService.fechar();
+    this.reiniciar();
+  }
+
+  // Suffixes a field's id/name with the active brand, so the catec, sisamb
+  // and gestao versions of this shared form never share an id/name — this
+  // keeps browser autofill from mixing up remembered values between them.
+  campoId(base: string): string {
+    return `${base}-${this.marca()}`;
   }
 
   // Dismisses the success/error toast.
@@ -251,7 +259,6 @@ export class OrcamentoModalComponent {
 
       this.status.set('sucesso');
       this.fechar();
-      this.reiniciar();
       this.mostrarToast(
         'sucesso',
         'Solicitação enviada! Nossa equipe vai entrar em contato em breve.',

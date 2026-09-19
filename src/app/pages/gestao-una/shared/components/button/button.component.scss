@@ -1,9 +1,12 @@
 .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 12px 28px;
-  font-size: 0.95rem;
+  // Scales down with the viewport so the button doesn't dwarf the hero
+  // copy around it on narrow screens (title/subtitle already use clamp()).
+  padding: clamp(8px, 2.4vw, 11px) clamp(14px, 4.5vw, 24px);
+  font-size: clamp(0.75rem, 2.2vw, 0.9rem);
   font-weight: 600;
   border-radius: 50px; // Fully rounded pill-shaped buttons
   border: 2px solid transparent;

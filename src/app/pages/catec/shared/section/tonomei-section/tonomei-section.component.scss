@@ -64,11 +64,19 @@
   overflow-x: auto;
   scrollbar-width: none; // Hides the scrollbar on Firefox
   -ms-overflow-style: none; // Hides the scrollbar on IE/Edge
+  -webkit-overflow-scrolling: touch; // Momentum scrolling on iOS Safari
+  scroll-snap-type: x proximity;
   margin-bottom: 32px;
   padding: 4px 0;
 
   &::-webkit-scrollbar {
     display: none; // Hides the scrollbar on Chrome/Safari
+  }
+
+  // Tabs wrap into two rows below this point (see .carousel-tabs), so
+  // horizontal scrolling is no longer needed.
+  @media (max-width: 768px) {
+    overflow-x: visible;
   }
 }
 
@@ -79,9 +87,14 @@
   min-width: max-content; // Keeps the tabs from squeezing together on mobile
   margin: 0 auto;
 
+  // Below this point three tabs no longer fit on one row without scrolling,
+  // so they wrap into two rows (two tabs, then the third centered) instead.
   @media (max-width: 768px) {
-    justify-content: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    min-width: 0;
     padding: 0 8px;
+    gap: 8px;
   }
 
   .tab-btn {
@@ -98,6 +111,7 @@
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.25s ease;
+    scroll-snap-align: start;
 
     .tab-icon {
       font-size: 1.1rem;
@@ -116,6 +130,27 @@
 
       .tab-icon {
         color: var(--primary-catec);
+      }
+    }
+
+    @media (max-width: 768px) {
+      flex: 0 1 calc(50% - 4px);
+      justify-content: center;
+      padding: 9px 16px;
+      font-size: 0.85rem;
+
+      .tab-icon {
+        font-size: 1rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      gap: 6px;
+      padding: 8px 13px;
+      font-size: 0.8rem;
+
+      .tab-icon {
+        font-size: 0.95rem;
       }
     }
   }

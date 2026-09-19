@@ -43,14 +43,14 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label for="nome">
+              <label [for]="campoId('nome')">
                 {{ tipoPessoa() === 'fisica' ? 'Nome Completo' : 'Razão Social' }}
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">
                   {{ tipoPessoa() === 'fisica' ? 'person_outline' : 'storefront' }}
                 </i>
-                <input id="nome" name="nome" type="text" [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
+                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="tentouEnviar() && nome.trim().length <= 1" />
               </div>
               @if (tentouEnviar() && nome.trim().length <= 1) { <span class="field-error">Informe o nome.</span>
@@ -58,12 +58,12 @@
             </div>
 
             <div class="form-field">
-              <label for="documento">
+              <label [for]="campoId('documento')">
                 {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }}
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">fingerprint</i>
-                <input id="documento" name="documento" type="text" inputmode="numeric"
+                <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric"
                   [placeholder]="tipoPessoa() === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00'"
                   [maxlength]="tipoPessoa() === 'fisica' ? 14 : 18" [(ngModel)]="documento"
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="tentouEnviar() && !documentoValido"
@@ -78,10 +78,10 @@
           </div>
 
           <div class="form-field">
-            <label for="endereco">Endereço *</label>
+            <label [for]="campoId('endereco')">Endereço *</label>
             <div class="input-with-icon">
               <i class="material-icons">location_on</i>
-              <input id="endereco" name="endereco" type="text" placeholder="Rua, número, bairro, cidade"
+              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" placeholder="Rua, número, bairro, cidade"
                 [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
                 [class.invalid]="tentouEnviar() && endereco.trim().length <= 3" />
             </div>
@@ -99,10 +99,10 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label for="email">E-mail</label>
+              <label [for]="campoId('email')">E-mail</label>
               <div class="input-with-icon">
                 <i class="material-icons">mail_outline</i>
-                <input id="email" name="email" type="email" [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
+                <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="tentouEnviar() && !emailValido" />
               </div>
               @if (tentouEnviar() && !emailValido) {
@@ -111,10 +111,10 @@
             </div>
 
             <div class="form-field">
-              <label for="telefone">Telefone</label>
+              <label [for]="campoId('telefone')">Telefone</label>
               <div class="input-with-icon">
                 <i class="material-icons">call</i>
-                <input id="telefone" name="telefone" type="tel" inputmode="numeric" placeholder="(00) 00000-0000"
+                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" placeholder="(00) 00000-0000"
                   maxlength="15" [(ngModel)]="telefone" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="tentouEnviar() && !telefoneValido" (input)="onTelefoneInput($event)" />
               </div>
@@ -134,19 +134,19 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label for="data">Data preferida</label>
+              <label [for]="campoId('data')">Data preferida</label>
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
-                <input id="data" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
+                <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
                   [ngModelOptions]="{ standalone: true }" />
               </div>
             </div>
 
             <div class="form-field">
-              <label for="hora">Horário</label>
+              <label [for]="campoId('hora')">Horário</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
-                <input id="hora" name="hora_preferida" type="time" [(ngModel)]="horaPreferida"
+                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" [(ngModel)]="horaPreferida"
                   [ngModelOptions]="{ standalone: true }" />
               </div>
             </div>
@@ -161,8 +161,8 @@
           </h4>
 
           <div class="form-field">
-            <label for="descricao">Conte um pouco sobre o seu caso</label>
-            <textarea id="descricao" name="descricao" rows="4" maxlength="800"
+            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso</label>
+            <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800"
               placeholder="Descreva o que você precisa..." [(ngModel)]="descricao"
               [ngModelOptions]="{ standalone: true }"></textarea>
           </div>
@@ -177,10 +177,10 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label for="imagem">Imagem</label>
+              <label [for]="campoId('imagem')">Imagem</label>
               <div class="file-field">
                 <i class="material-icons">image</i>
-                <input id="imagem" type="file" accept="image/*" (change)="onArquivoSelecionado($event, 'imagem')" />
+                <input [id]="campoId('imagem')" type="file" accept="image/*" (change)="onArquivoSelecionado($event, 'imagem')" />
               </div>
               @if (imagemErro()) {
               <span class="field-error">{{ imagemErro() }}</span>
@@ -190,10 +190,10 @@
             </div>
 
             <div class="form-field">
-              <label for="documentoAnexo">Documento</label>
+              <label [for]="campoId('documentoAnexo')">Documento</label>
               <div class="file-field">
                 <i class="material-icons">description</i>
-                <input id="documentoAnexo" type="file" accept=".pdf,.doc,.docx,image/*"
+                <input [id]="campoId('documentoAnexo')" type="file" accept=".pdf,.doc,.docx,image/*"
                   (change)="onArquivoSelecionado($event, 'documento')" />
               </div>
               @if (documentoErro()) {
