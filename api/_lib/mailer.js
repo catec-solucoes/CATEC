@@ -1,7 +1,43 @@
+const fs = require('fs');
+const path = require('path');
 const MailComposer = require('nodemailer/lib/mail-composer');
 const { google } = require('googleapis');
 
 const OAuth2 = google.auth.OAuth2;
+
+// Cache per cold start — the logo files never change during a function's
+// lifetime, so there's no reason to re-read/re-encode them on every request.
+const cacheLogoBase64 = new Map();
+
+// Reads a logo from this function's own bundle (api/_lib/assets/) and
+// returns it as a data: URI, so the email never depends on fetching an
+// image from a URL — the bytes travel inside the message itself, wherever
+// this function ends up running (Vercel today, possibly AWS Lambda later).
+function logoBase64(nomeArquivo) {
+  if (!cacheLogoBase64.has(nomeArquivo)) {
+    const caminho = path.join(__dirname, 'assets', nomeArquivo);
+    const buffer = fs.readFileSync(caminho);
+    cacheLogoBase64.set(nomeArquivo, `data:image/png;base64,${buffer.toString('base64')}`);
+  }
+  return cacheLogoBase64.get(nomeArquivo);
+}
+
+// Lets this API be called cross-origin — the site is meant to work whether
+// it's served from this same Vercel deployment or from a static host (e.g.
+// AWS S3/CloudFront) that can't run these functions itself, so the frontend
+// always calls this backend's absolute URL regardless of its own origin.
+// No cookies/credentials are involved, so a wildcard origin is safe here.
+function aplicarCors(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}
 
 // Reused across warm invocations of this function instance, so a repeat
 // request doesn't have to round-trip to Google's OAuth endpoint again for
@@ -197,4 +233,6 @@ module.exports = {
   escapeHtml,
   montarTextoPlano,
   montarEmailHtml,
+  aplicarCors,
+  logoBase64,
 };

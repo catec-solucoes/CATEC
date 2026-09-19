@@ -15,6 +15,12 @@ const DURACAO_TOAST_MS = 5000;
 // base64 (~33% larger) inside the same JSON payload as the rest of the form.
 const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 
+// The email backend only runs on Vercel (it needs a Node.js runtime, which
+// a static host like AWS S3/CloudFront can't provide), so the form always
+// calls this absolute URL — whether this build itself ends up served from
+// Vercel or from a static host, the request lands on the same place.
+const API_BASE_URL = 'https://catec.vercel.app';
+
 // Quote request modal: form, validation and submission via the /api/send-email backend.
 @Component({
   selector: 'app-orcamento-modal',
@@ -298,9 +304,9 @@ export class OrcamentoModalComponent {
       ]);
 
       const endpoints: Record<MarcaOrcamento, string> = {
-        catec: '/api/send-email',
-        sisamb: '/api/send-email-sisamb',
-        gestao: '/api/send-email-gestao',
+        catec: `${API_BASE_URL}/api/send-email`,
+        sisamb: `${API_BASE_URL}/api/send-email-sisamb`,
+        gestao: `${API_BASE_URL}/api/send-email-gestao`,
       };
       const endpoint = endpoints[this.orcamentoService.marca()];
 

@@ -4,13 +4,13 @@ const {
   paraAnexoNodemailer,
   montarTextoPlano,
   montarEmailHtml,
+  aplicarCors,
+  logoBase64,
 } = require('./_lib/mailer');
 
-// Versioned query string busts any stale "failed to fetch" cache that a mail
-// provider's image proxy may have kept from an earlier deploy.
-const LOGO_GESTAO_URL = 'https://catec.vercel.app/images/logo-gestao-una-email.png?v=2';
-
 module.exports = async function handler(req, res) {
+  if (aplicarCors(req, res)) return;
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Método não permitido' });
@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
     };
 
     const html = montarEmailHtml({
-      logoUrl: LOGO_GESTAO_URL,
+      logoUrl: logoBase64('logo-gestao-una-email.png'),
       logoAlt: 'Gestão Una',
       logoLargura: 160,
       logoAltura: 32,
