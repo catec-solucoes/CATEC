@@ -19,7 +19,10 @@ const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 // a static host like AWS S3/CloudFront can't provide), so the form always
 // calls this absolute URL — whether this build itself ends up served from
 // Vercel or from a static host, the request lands on the same place.
-const API_BASE_URL = 'https://catec.vercel.app';
+// catec-tau (the catec-solucoes org's Vercel project) is the one actively
+// kept up to date; the original catec.vercel.app project isn't part of
+// this deploy flow right now.
+const API_BASE_URL = 'https://catec-tau.vercel.app';
 
 // Quote request modal: form, validation and submission via the /api/send-email backend.
 @Component({
