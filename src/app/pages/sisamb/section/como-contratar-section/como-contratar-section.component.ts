@@ -72,14 +72,6 @@ export class ComoContratarSectionComponent {
       const el = this.timeline()?.nativeElement;
       if (!el) return;
 
-      const prefersReducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      if (prefersReducedMotion) {
-        el.classList.add('in-view');
-        return;
-      }
-
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {

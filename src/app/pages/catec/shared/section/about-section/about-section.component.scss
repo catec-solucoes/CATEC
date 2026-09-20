@@ -169,21 +169,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .feature-card {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .about-features-grid.in-view .feature-card {
-    animation: none;
-  }
-
-  .feature-card:hover .feature-icon {
-    transform: none;
-  }
-}
 
 /* IMAGE AND BADGE COLUMN */
 .about-image-wrapper {
@@ -303,8 +288,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .metric-badge {
-    animation: none;
-  }
-}

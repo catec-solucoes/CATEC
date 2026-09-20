@@ -134,26 +134,6 @@
     }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    app-card {
-      opacity: 1;
-      transform: none;
-      transition: none;
-      animation: none;
-    }
-
-    ::ng-deep .catec-card:hover {
-      transform: none;
-    }
-
-    ::ng-deep .catec-card:hover .icon-wrapper {
-      transform: none;
-    }
-
-    ::ng-deep .card-icon {
-      animation: none;
-    }
-  }
 }
 
 .more-products-actions {

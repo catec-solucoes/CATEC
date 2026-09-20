@@ -406,13 +406,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-content,
-  .hero-circles,
-  .floating-card,
-  .floating-icon {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}

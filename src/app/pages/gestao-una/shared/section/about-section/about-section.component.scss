@@ -170,12 +170,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .features-track {
-    animation: none;
-  }
-}
-
 /* IMAGE AND BADGE COLUMN */
 .about-image-wrapper {
   flex: 1;
@@ -286,11 +280,5 @@
   }
   50% {
     transform: translateY(-6px);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .metric-badge {
-    animation: none;
   }
 }

@@ -94,13 +94,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
 
 .seguranca-cta {
   background: var(--bg-light);

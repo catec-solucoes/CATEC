@@ -79,9 +79,3 @@
     transform: translate3d(-50%, 0, 0);
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .image-ticker-wrapper .ticker-track {
-    animation: none;
-  }
-}

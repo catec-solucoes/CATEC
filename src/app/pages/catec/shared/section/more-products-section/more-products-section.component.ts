@@ -31,14 +31,6 @@ export class MoreProductsSectionComponent {
       const grid = this.productsGrid()?.nativeElement;
       if (!grid) return;
 
-      const prefersReducedMotion = window.matchMedia(
-        '(prefers-reduced-motion: reduce)',
-      ).matches;
-      if (prefersReducedMotion) {
-        grid.classList.add('in-view');
-        return;
-      }
-
       const observer = new IntersectionObserver(
         ([entry]) => {
           if (entry.isIntersecting) {

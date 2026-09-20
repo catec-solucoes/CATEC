@@ -67,13 +67,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
 
 .hero-title {
   font-size: 2.5rem;

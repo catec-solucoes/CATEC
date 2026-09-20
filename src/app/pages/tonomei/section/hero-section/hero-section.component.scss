@@ -198,20 +198,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mini-card {
-    animation: none;
-    transform: rotate(var(--rot));
-
-    &:hover {
-      transform: rotate(var(--rot));
-
-      .card-icon {
-        transform: none;
-      }
-    }
-  }
-}
 
 /* --- RIGHT COLUMN (IMAGE AND CARDS) --- */
 .hero-media {

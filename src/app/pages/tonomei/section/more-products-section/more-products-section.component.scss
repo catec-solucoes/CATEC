@@ -180,12 +180,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .advantage-tile-face,
-  .advantage-tile-detail {
-    transition: none;
-  }
-}
 
 .more-products-actions {
   display: flex;

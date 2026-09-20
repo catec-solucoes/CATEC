@@ -382,16 +382,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hero-circles,
-  .floating-card,
-  .floating-icon {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-
 /* ORGANIC WAVE TRANSITION */
 .hero-wave {
   position: absolute;

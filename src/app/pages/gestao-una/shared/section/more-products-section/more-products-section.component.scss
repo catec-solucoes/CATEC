@@ -178,10 +178,3 @@
     }
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .advantage-tile-face,
-  .advantage-tile-detail {
-    transition: none;
-  }
-}

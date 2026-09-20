@@ -270,12 +270,3 @@
   display: inline-block;
   margin-top: 12px;
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .passos-timeline,
-  .passo-item {
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-}
