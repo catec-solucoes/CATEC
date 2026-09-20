@@ -5,7 +5,7 @@ const {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  logoBase64,
+  urlDaLogo,
 } = require('./_lib/mailer');
 
 module.exports = async function handler(req, res) {
@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
     };
 
     const html = montarEmailHtml({
-      logoUrl: logoBase64('logo-sisamb-email.png'),
+      logoUrl: urlDaLogo('logo-sisamb-email.png'),
       logoAlt: 'SISAMB',
       logoLargura: 140,
       logoAltura: 47,

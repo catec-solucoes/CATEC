@@ -5,7 +5,7 @@ const {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  logoBase64,
+  urlDaLogo,
 } = require('./_lib/mailer');
 
 module.exports = async function handler(req, res) {
@@ -61,7 +61,7 @@ module.exports = async function handler(req, res) {
     };
 
     const html = montarEmailHtml({
-      logoUrl: logoBase64('logo-gestao-una-email.png'),
+      logoUrl: urlDaLogo('logo-gestao-una-email.png'),
       logoAlt: 'Gestão Una',
       logoLargura: 160,
       logoAltura: 32,

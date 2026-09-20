@@ -2,10 +2,5 @@
   "outputDirectory": "dist/catec",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
-  ],
-  "functions": {
-    "api/*.js": {
-      "includeFiles": "api/_lib/assets/**"
-    }
-  }
+  ]
 }

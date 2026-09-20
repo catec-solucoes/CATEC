@@ -1,25 +1,20 @@
-const fs = require('fs');
-const path = require('path');
 const MailComposer = require('nodemailer/lib/mail-composer');
 const { google } = require('googleapis');
 
 const OAuth2 = google.auth.OAuth2;
 
-// Cache per cold start — the logo files never change during a function's
-// lifetime, so there's no reason to re-read/re-encode them on every request.
-const cacheLogoBase64 = new Map();
+// The email logos are PNGs from the site's public/images/ folder. They have to
+// be PNG (WebP doesn't render in many mail clients) and referenced by absolute
+// HTTPS URL: Gmail blocks data: URIs, and cid: attachments broke for recipients
+// on other mail hosts. The URL uses the production domain rather than a
+// *.vercel.app one so it keeps working wherever the site and this API are
+// hosted (Vercel today, AWS later). Bump the version whenever a logo file
+// changes so mail proxies don't keep serving a cached (or cached-as-missing) copy.
+const LOGOS_BASE_URL = 'https://catecsolucoes.com.br/images';
+const VERSAO_LOGOS = 3;
 
-// Reads a logo from this function's own bundle (api/_lib/assets/) and
-// returns it as a data: URI, so the email never depends on fetching an
-// image from a URL — the bytes travel inside the message itself, wherever
-// this function ends up running (Vercel today, possibly AWS Lambda later).
-function logoBase64(nomeArquivo) {
-  if (!cacheLogoBase64.has(nomeArquivo)) {
-    const caminho = path.join(__dirname, 'assets', nomeArquivo);
-    const buffer = fs.readFileSync(caminho);
-    cacheLogoBase64.set(nomeArquivo, `data:image/png;base64,${buffer.toString('base64')}`);
-  }
-  return cacheLogoBase64.get(nomeArquivo);
+function urlDaLogo(nomeArquivo) {
+  return `${LOGOS_BASE_URL}/${nomeArquivo}?v=${VERSAO_LOGOS}`;
 }
 
 // Lets this API be called cross-origin — the site is meant to work whether
@@ -234,5 +229,5 @@ module.exports = {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  logoBase64,
+  urlDaLogo,
 };
