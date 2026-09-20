@@ -54,16 +54,22 @@ export class TonomeiSectionComponent {
       this.destroyRef.onDestroy(() => this.stopAutoplay());
     });
 
-    // Keeps the active tab scrolled into view on mobile, where the tab strip
-    // scrolls horizontally and autoplay/arrow navigation could otherwise
-    // advance the slide without the tab bar visibly following along.
+    // Keeps the active tab visible when the tab strip scrolls horizontally, so
+    // autoplay/arrow navigation can't advance the slide without the tab bar
+    // following along. Only the strip itself is scrolled: scrollIntoView would
+    // also scroll the page vertically, dragging the visitor down to this
+    // section every time the autoplay advances.
     effect(() => {
       const index = this.activeSlideIndex();
-      this.tabButtons?.get(index)?.nativeElement.scrollIntoView({
-        behavior: 'smooth',
-        inline: 'nearest',
-        block: 'nearest',
-      });
+      const tab = this.tabButtons?.get(index)?.nativeElement;
+      const strip = tab?.closest<HTMLElement>('.carousel-tabs-wrapper');
+      if (!tab || !strip) return;
+
+      const stripBox = strip.getBoundingClientRect();
+      const tabBox = tab.getBoundingClientRect();
+      const centered =
+        strip.scrollLeft + (tabBox.left - stripBox.left) - (stripBox.width - tabBox.width) / 2;
+      strip.scrollTo({ left: centered, behavior: 'smooth' });
     });
   }
 
