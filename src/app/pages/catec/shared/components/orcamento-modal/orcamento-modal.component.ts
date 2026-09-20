@@ -1,5 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, effect, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  effect,
+  inject,
+  isDevMode,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { MarcaOrcamento, OrcamentoService } from './orcamento.service';
@@ -22,7 +30,9 @@ const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 // catec-tau (the catec-solucoes org's Vercel project) is the one actively
 // kept up to date; the original catec.vercel.app project isn't part of
 // this deploy flow right now.
-const API_BASE_URL = 'https://catec-tau.vercel.app';
+// While running `ng serve` it targets the local API (`npm run api`) so the form
+// can be tested without deploying.
+const API_BASE_URL = isDevMode() ? 'http://localhost:3557' : 'https://catec-tau.vercel.app';
 
 // Quote request modal: form, validation and submission via the /api/send-email backend.
 @Component({
