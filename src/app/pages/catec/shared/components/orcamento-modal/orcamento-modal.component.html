@@ -51,10 +51,11 @@
                   {{ tipoPessoa() === 'fisica' ? 'person_outline' : 'storefront' }}
                 </i>
                 <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="tentouEnviar() && nome.trim().length <= 1" />
+                  [class.invalid]="mostrarErro('nome', !nomeValido)" (blur)="tocar('nome')" />
               </div>
-              @if (tentouEnviar() && nome.trim().length <= 1) { <span class="field-error">Informe o nome.</span>
-                }
+              @if (mostrarErro('nome', !nomeValido)) {
+              <span class="field-error">Informe o nome.</span>
+              }
             </div>
 
             <div class="form-field">
@@ -66,10 +67,10 @@
                 <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric"
                   [placeholder]="tipoPessoa() === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00'"
                   [maxlength]="tipoPessoa() === 'fisica' ? 14 : 18" [(ngModel)]="documento"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="tentouEnviar() && !documentoValido"
-                  (input)="onDocumentoInput($event)" />
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('documento', !documentoValido)"
+                  (input)="onDocumentoInput($event)" (blur)="tocar('documento')" />
               </div>
-              @if (tentouEnviar() && !documentoValido) {
+              @if (mostrarErro('documento', !documentoValido)) {
               <span class="field-error">
                 Informe um {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }} válido.
               </span>
@@ -83,10 +84,11 @@
               <i class="material-icons">location_on</i>
               <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" placeholder="Rua, número, bairro, cidade"
                 [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
-                [class.invalid]="tentouEnviar() && endereco.trim().length <= 3" />
+                [class.invalid]="mostrarErro('endereco', !enderecoValido)" (blur)="tocar('endereco')" />
             </div>
-            @if (tentouEnviar() && endereco.trim().length <= 3) { <span class="field-error">Informe o endereço.</span>
-              }
+            @if (mostrarErro('endereco', !enderecoValido)) {
+            <span class="field-error">Informe o endereço.</span>
+            }
           </div>
         </section>
 
@@ -103,9 +105,9 @@
               <div class="input-with-icon">
                 <i class="material-icons">mail_outline</i>
                 <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="tentouEnviar() && !emailValido" />
+                  [class.invalid]="mostrarErro('email', !emailValido)" (blur)="tocar('email')" />
               </div>
-              @if (tentouEnviar() && !emailValido) {
+              @if (mostrarErro('email', !emailValido)) {
               <span class="field-error">Informe um e-mail válido.</span>
               }
             </div>
@@ -116,9 +118,10 @@
                 <i class="material-icons">call</i>
                 <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" placeholder="(00) 00000-0000"
                   maxlength="15" [(ngModel)]="telefone" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="tentouEnviar() && !telefoneValido" (input)="onTelefoneInput($event)" />
+                  [class.invalid]="mostrarErro('telefone', !telefoneValido)" (input)="onTelefoneInput($event)"
+                  (blur)="tocar('telefone')" />
               </div>
-              @if (tentouEnviar() && !telefoneValido) {
+              @if (mostrarErro('telefone', !telefoneValido)) {
               <span class="field-error">Informe um telefone válido.</span>
               }
             </div>
@@ -138,8 +141,11 @@
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
                 <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
-                  [ngModelOptions]="{ standalone: true }" />
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)" (blur)="tocar('data')" (change)="tocar('data')" />
               </div>
+              @if (mostrarErro('data', !dataValida)) {
+              <span class="field-error">Escolha uma data de hoje em diante.</span>
+              }
             </div>
 
             <div class="form-field">

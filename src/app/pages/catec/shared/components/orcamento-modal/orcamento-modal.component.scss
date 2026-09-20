@@ -303,6 +303,11 @@
   &:has(input:focus) .material-icons {
     color: var(--primary-catec);
   }
+
+  // Declared after the focus rule so an invalid field keeps its red icon while focused.
+  &:has(input.invalid) .material-icons {
+    color: #dc2626;
+  }
 }
 
 .field-error {

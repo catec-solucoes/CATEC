@@ -83,8 +83,76 @@ async function enviarEmail(mailOptions) {
 
 const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 
+// The rules below mirror src/app/pages/catec/shared/components/orcamento-modal/
+// orcamento-validators.ts (the browser-side check); the API repeats them because
+// anything validated only in the browser can be bypassed.
+
+const REGEX_EMAIL = /^[a-z0-9._%+-]+@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,}$/i;
+
 function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+  const email = String(value || '').trim();
+  if (email.length > 254 || !REGEX_EMAIL.test(email)) return false;
+  const local = email.slice(0, email.lastIndexOf('@'));
+  return local.length <= 64 && !/^\.|\.\.|\.$/.test(local);
+}
+
+function digitoVerificador(digitos, pesos) {
+  const soma = digitos.reduce((total, digito, i) => total + digito * pesos[i], 0);
+  const resto = soma % 11;
+  return resto < 2 ? 0 : 11 - resto;
+}
+
+function isValidCpf(value) {
+  const digitos = String(value || '').replace(/\D/g, '');
+  if (digitos.length !== 11 || /^(\d)\1{10}$/.test(digitos)) return false;
+  const numeros = digitos.split('').map(Number);
+  return (
+    digitoVerificador(numeros.slice(0, 9), [10, 9, 8, 7, 6, 5, 4, 3, 2]) === numeros[9] &&
+    digitoVerificador(numeros.slice(0, 10), [11, 10, 9, 8, 7, 6, 5, 4, 3, 2]) === numeros[10]
+  );
+}
+
+function isValidCnpj(value) {
+  const digitos = String(value || '').replace(/\D/g, '');
+  if (digitos.length !== 14 || /^(\d)\1{13}$/.test(digitos)) return false;
+  const numeros = digitos.split('').map(Number);
+  return (
+    digitoVerificador(numeros.slice(0, 12), [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) ===
+      numeros[12] &&
+    digitoVerificador(numeros.slice(0, 13), [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]) ===
+      numeros[13]
+  );
+}
+
+// True when a DD/MM/YYYY date (the format the form sends) is a real calendar
+// date and is today or later. "Today" is Brazil's date, not the server's: the
+// function runs in UTC, which is already "tomorrow" in Brazil after 9 p.m.
+function isTodayOrFuture(dataBr, agora = new Date()) {
+  const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(dataBr || ''));
+  if (!partes) return false;
+
+  const [dia, mes, ano] = partes.slice(1).map(Number);
+  const data = new Date(Date.UTC(ano, mes - 1, dia));
+  const existe =
+    data.getUTCFullYear() === ano && data.getUTCMonth() === mes - 1 && data.getUTCDate() === dia;
+
+  const hoje = agora.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  return existe && `${partes[3]}-${partes[2]}-${partes[1]}` >= hoje;
+}
+
+// Checks the fields that need more than "is present". Returns the error
+// message to send back with a 400, or null when everything is fine. The
+// document (CPF or CNPJ) and the preferred date are optional server-side,
+// but must be valid when provided.
+function erroDeValidacao({ email, document, preferredDate }) {
+  if (!isValidEmail(email)) return 'Email inválido';
+  if (document && !isValidCpf(document) && !isValidCnpj(document)) {
+    return 'CPF ou CNPJ inválido';
+  }
+  if (preferredDate && !isTodayOrFuture(preferredDate)) {
+    return 'A data preferida deve ser de hoje em diante';
+  }
+  return null;
 }
 
 // Validates an { nome, tipo, base64 } attachment payload and converts it to
@@ -224,6 +292,10 @@ function montarEmailHtml({
 module.exports = {
   enviarEmail,
   isValidEmail,
+  isValidCpf,
+  isValidCnpj,
+  isTodayOrFuture,
+  erroDeValidacao,
   paraAnexoNodemailer,
   escapeHtml,
   montarTextoPlano,

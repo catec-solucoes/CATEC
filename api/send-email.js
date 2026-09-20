@@ -1,6 +1,6 @@
 const {
   enviarEmail,
-  isValidEmail,
+  erroDeValidacao,
   paraAnexoNodemailer,
   montarTextoPlano,
   montarEmailHtml,
@@ -35,8 +35,9 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  if (!isValidEmail(email)) {
-    return res.status(400).json({ error: 'Email inválido' });
+  const erroValidacao = erroDeValidacao({ email, document, preferredDate });
+  if (erroValidacao) {
+    return res.status(400).json({ error: erroValidacao });
   }
 
   let attachments;

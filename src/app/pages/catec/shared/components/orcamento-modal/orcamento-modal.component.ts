@@ -11,6 +11,13 @@ import {
 import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { MarcaOrcamento, OrcamentoService } from './orcamento.service';
+import {
+  isTodayOrFuture,
+  isValidCnpj,
+  isValidCpf,
+  isValidEmail,
+  todayIso,
+} from './orcamento-validators';
 
 type TipoPessoa = 'fisica' | 'juridica';
 type StatusEnvio = 'idle' | 'enviando' | 'sucesso' | 'erro';
@@ -52,6 +59,9 @@ export class OrcamentoModalComponent {
   tipoPessoa = signal<TipoPessoa>('fisica');
   status = signal<StatusEnvio>('idle');
   tentouEnviar = signal(false);
+  // Fields the visitor has already left (blurred), so their errors show right
+  // away instead of only after the first submit attempt.
+  private readonly camposTocados = signal<ReadonlySet<string>>(new Set());
   toast = signal<Toast | null>(null);
   private toastTimeoutId?: ReturnType<typeof setTimeout>;
 
@@ -69,7 +79,8 @@ export class OrcamentoModalComponent {
   imagemErro = signal<string | null>(null);
   documentoErro = signal<string | null>(null);
 
-  readonly dataMinima = new Date().toISOString().split('T')[0];
+  // Earliest selectable date: today in the visitor's local time zone.
+  readonly dataMinima = todayIso();
 
   // Locks page scroll while the modal is open.
   constructor() {
@@ -97,10 +108,28 @@ export class OrcamentoModalComponent {
     clearTimeout(this.toastTimeoutId);
   }
 
+  // Marks a field as visited, which lets its validation error show.
+  tocar(campo: string): void {
+    this.camposTocados.update((campos) => new Set(campos).add(campo));
+  }
+
+  // True when a field's error should be visible: it's invalid and either the
+  // visitor already left the field or tried to submit. After that the error
+  // updates live as they type, and disappears as soon as the value is valid.
+  mostrarErro(campo: string, invalido: boolean): boolean {
+    return invalido && (this.tentouEnviar() || this.camposTocados().has(campo));
+  }
+
   // Switches between individual (CPF) and company (CNPJ) and clears the document field.
   selecionarTipoPessoa(tipo: TipoPessoa): void {
     this.tipoPessoa.set(tipo);
     this.documento = '';
+    // The field was just emptied, so don't flag it as an error until it's visited again.
+    this.camposTocados.update((campos) => {
+      const restantes = new Set(campos);
+      restantes.delete('documento');
+      return restantes;
+    });
   }
 
   // Formats the document field as CPF or CNPJ while typing.
@@ -272,17 +301,33 @@ export class OrcamentoModalComponent {
     return `${dia}/${mes}/${ano}`;
   }
 
-  // True when the document field has a complete CPF or CNPJ.
-  get documentoValido(): boolean {
-    const digitos = this.documento.replace(/\D/g, '');
-    return this.tipoPessoa() === 'fisica'
-      ? digitos.length === 11
-      : digitos.length === 14;
+  // True when the name (or company name) field has at least two characters.
+  get nomeValido(): boolean {
+    return this.nome.trim().length > 1;
   }
 
-  // True when the email field looks like a valid address.
+  // True when the address field has enough characters to be meaningful.
+  get enderecoValido(): boolean {
+    return this.endereco.trim().length > 3;
+  }
+
+  // True when the document field has a valid CPF (individual) or CNPJ (company),
+  // check digits included.
+  get documentoValido(): boolean {
+    return this.tipoPessoa() === 'fisica'
+      ? isValidCpf(this.documento)
+      : isValidCnpj(this.documento);
+  }
+
+  // True when the email field is a well-formed address.
   get emailValido(): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim());
+    return isValidEmail(this.email);
+  }
+
+  // The preferred date is optional, but when filled it can't be in the past.
+  // The native `min` only limits the picker; a typed or pasted date bypasses it.
+  get dataValida(): boolean {
+    return !this.dataPreferida || isTodayOrFuture(this.dataPreferida);
   }
 
   // True when the phone field has enough digits.
@@ -293,11 +338,12 @@ export class OrcamentoModalComponent {
   // True when all required fields pass validation.
   get formularioValido(): boolean {
     return (
-      this.nome.trim().length > 1 &&
+      this.nomeValido &&
       this.documentoValido &&
-      this.endereco.trim().length > 3 &&
+      this.enderecoValido &&
       this.emailValido &&
-      this.telefoneValido
+      this.telefoneValido &&
+      this.dataValida
     );
   }
 
@@ -382,6 +428,7 @@ export class OrcamentoModalComponent {
     this.imagemErro.set(null);
     this.documentoErro.set(null);
     this.tentouEnviar.set(false);
+    this.camposTocados.set(new Set());
     this.status.set('idle');
     this.formRef?.nativeElement?.reset();
   }
