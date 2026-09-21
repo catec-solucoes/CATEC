@@ -69,7 +69,7 @@ const FOOTER_LOGOS: Record<
     invert: true,
   },
   sisamb: {
-    src: 'images/logo-sisamb.webp',
+    src: 'images-sisamb/sisamb.webp',
     alt: 'Sisamb.eco',
     invert: true,
   },

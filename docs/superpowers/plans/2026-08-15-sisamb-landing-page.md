@@ -1087,7 +1087,7 @@ Replace the contents of `src/app/pages/sisamb/section/about-section/about-sectio
         <div class="about-bg-shape"></div>
 
         <img
-          src="img/sisamb.webp"
+          src="immages-sisamb/sisamb.webp"
           alt="Plataforma SISAMB de gestão ambiental"
           class="about-img"
           loading="lazy"
