@@ -171,10 +171,14 @@
           </h4>
 
           <div class="form-field">
-            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso (opcional)</label>
-            <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800"
+            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso *</label>
+            <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800" required
               placeholder="Descreva o que você precisa..." [(ngModel)]="descricao"
-              [ngModelOptions]="{ standalone: true }"></textarea>
+              [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('descricao', !descricaoValida)"
+              (blur)="tocar('descricao')"></textarea>
+            @if (mostrarErro('descricao', !descricaoValida)) {
+            <span class="field-error">Conte um pouco sobre o que você precisa.</span>
+            }
           </div>
         </section>
 

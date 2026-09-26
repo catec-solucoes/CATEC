@@ -345,6 +345,11 @@ export class OrcamentoModalComponent {
     return this.horaPreferida.trim().length > 0;
   }
 
+  // True when the case description has enough characters to be meaningful.
+  get descricaoValida(): boolean {
+    return this.descricao.trim().length > 3;
+  }
+
   // True when all required fields pass validation.
   get formularioValido(): boolean {
     return (
@@ -354,7 +359,8 @@ export class OrcamentoModalComponent {
       this.emailValido &&
       this.telefoneValido &&
       this.dataValida &&
-      this.horaValida
+      this.horaValida &&
+      this.descricaoValida
     );
   }
 
