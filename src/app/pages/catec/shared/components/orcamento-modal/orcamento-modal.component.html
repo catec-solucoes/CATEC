@@ -138,10 +138,10 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label [for]="campoId('data')">Data preferida (opcional)</label>
+              <label [for]="campoId('data')">Data preferida *</label>
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
-                <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
+                <input [id]="campoId('data')" type="date" required [min]="dataMinima" [(ngModel)]="dataPreferida"
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)" (blur)="tocar('data')" (change)="tocar('data')" />
               </div>
               @if (mostrarErro('data', !dataValida)) {
@@ -150,12 +150,15 @@
             </div>
 
             <div class="form-field">
-              <label [for]="campoId('hora')">Horário (opcional)</label>
+              <label [for]="campoId('hora')">Horário *</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
-                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" [(ngModel)]="horaPreferida"
-                  [ngModelOptions]="{ standalone: true }" />
+                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" required [(ngModel)]="horaPreferida"
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('hora', !horaValida)" (blur)="tocar('hora')" (change)="tocar('hora')" />
               </div>
+              @if (mostrarErro('hora', !horaValida)) {
+              <span class="field-error">Escolha um horário.</span>
+              }
             </div>
           </div>
         </section>

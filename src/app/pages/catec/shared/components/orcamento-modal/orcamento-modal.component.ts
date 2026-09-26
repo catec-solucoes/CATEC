@@ -329,15 +329,20 @@ export class OrcamentoModalComponent {
     return isValidEmail(this.email);
   }
 
-  // The preferred date is optional, but when filled it can't be in the past.
+  // The preferred date must be filled in and can't be in the past.
   // The native `min` only limits the picker; a typed or pasted date bypasses it.
   get dataValida(): boolean {
-    return !this.dataPreferida || isTodayOrFuture(this.dataPreferida);
+    return !!this.dataPreferida && isTodayOrFuture(this.dataPreferida);
   }
 
   // True when the phone field has enough digits.
   get telefoneValido(): boolean {
     return this.telefone.replace(/\D/g, '').length >= 10;
+  }
+
+  // True when the preferred time field is filled in.
+  get horaValida(): boolean {
+    return this.horaPreferida.trim().length > 0;
   }
 
   // True when all required fields pass validation.
@@ -348,7 +353,8 @@ export class OrcamentoModalComponent {
       this.enderecoValido &&
       this.emailValido &&
       this.telefoneValido &&
-      this.dataValida
+      this.dataValida &&
+      this.horaValida
     );
   }
 
