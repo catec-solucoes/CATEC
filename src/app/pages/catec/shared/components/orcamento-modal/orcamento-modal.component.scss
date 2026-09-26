@@ -148,6 +148,12 @@
   line-height: 1.4;
 }
 
+.orcamento-campos-obrigatorios {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
 .orcamento-form {
   display: flex;
   flex-direction: column;

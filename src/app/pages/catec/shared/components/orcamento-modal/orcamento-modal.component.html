@@ -14,6 +14,7 @@
           <p class="orcamento-subtitle">
             Preencha os dados abaixo e entraremos em contato o quanto antes.
           </p>
+          <p class="orcamento-campos-obrigatorios">* Campos obrigatórios</p>
         </div>
         <button type="button" class="orcamento-close" (click)="fechar()" aria-label="Fechar">
           <i class="fa-solid fa-xmark"></i>
@@ -44,13 +45,13 @@
           <div class="form-row">
             <div class="form-field">
               <label [for]="campoId('nome')">
-                {{ tipoPessoa() === 'fisica' ? 'Nome Completo' : 'Razão Social' }}
+                {{ tipoPessoa() === 'fisica' ? 'Nome Completo' : 'Razão Social' }} *
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">
                   {{ tipoPessoa() === 'fisica' ? 'person_outline' : 'storefront' }}
                 </i>
-                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
+                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" required [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="mostrarErro('nome', !nomeValido)" (blur)="tocar('nome')" />
               </div>
               @if (mostrarErro('nome', !nomeValido)) {
@@ -60,11 +61,11 @@
 
             <div class="form-field">
               <label [for]="campoId('documento')">
-                {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }}
+                {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }} *
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">fingerprint</i>
-                <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric"
+                <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric" required
                   [placeholder]="tipoPessoa() === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00'"
                   [maxlength]="tipoPessoa() === 'fisica' ? 14 : 18" [(ngModel)]="documento"
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('documento', !documentoValido)"
@@ -82,7 +83,7 @@
             <label [for]="campoId('endereco')">Endereço *</label>
             <div class="input-with-icon">
               <i class="material-icons">location_on</i>
-              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" placeholder="Rua, número, bairro, cidade"
+              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" required placeholder="Rua, número, bairro, cidade"
                 [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
                 [class.invalid]="mostrarErro('endereco', !enderecoValido)" (blur)="tocar('endereco')" />
             </div>
@@ -101,10 +102,10 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label [for]="campoId('email')">E-mail</label>
+              <label [for]="campoId('email')">E-mail *</label>
               <div class="input-with-icon">
                 <i class="material-icons">mail_outline</i>
-                <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
+                <input [id]="campoId('email')" [name]="campoId('email')" type="email" required [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="mostrarErro('email', !emailValido)" (blur)="tocar('email')" />
               </div>
               @if (mostrarErro('email', !emailValido)) {
@@ -113,10 +114,10 @@
             </div>
 
             <div class="form-field">
-              <label [for]="campoId('telefone')">Telefone</label>
+              <label [for]="campoId('telefone')">Telefone *</label>
               <div class="input-with-icon">
                 <i class="material-icons">call</i>
-                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" placeholder="(00) 00000-0000"
+                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" required placeholder="(00) 00000-0000"
                   maxlength="15" [(ngModel)]="telefone" [ngModelOptions]="{ standalone: true }"
                   [class.invalid]="mostrarErro('telefone', !telefoneValido)" (input)="onTelefoneInput($event)"
                   (blur)="tocar('telefone')" />
@@ -137,7 +138,7 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label [for]="campoId('data')">Data preferida</label>
+              <label [for]="campoId('data')">Data preferida (opcional)</label>
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
                 <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
@@ -149,7 +150,7 @@
             </div>
 
             <div class="form-field">
-              <label [for]="campoId('hora')">Horário</label>
+              <label [for]="campoId('hora')">Horário (opcional)</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
                 <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" [(ngModel)]="horaPreferida"
@@ -167,7 +168,7 @@
           </h4>
 
           <div class="form-field">
-            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso</label>
+            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso (opcional)</label>
             <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800"
               placeholder="Descreva o que você precisa..." [(ngModel)]="descricao"
               [ngModelOptions]="{ standalone: true }"></textarea>
