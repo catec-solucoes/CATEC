@@ -39,7 +39,8 @@ const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 // this deploy flow right now.
 // While running `ng serve`, a relative path is used instead so the request goes
 // through the dev server's own proxy (see proxy.conf.json), which forwards it
-// server-to-server to the local API (`sh scripts/dev-with-env.sh`, port 3557).
+// server-to-server to the local API (`npm run api`, port 3557 — a plain Node
+// server that serves the same /api handlers without needing a Vercel login).
 // That keeps testing working from any device that can reach ng serve's port
 // (e.g. a phone via Chrome's remote-debugging port forwarding) without also
 // needing port 3557 reachable or open to CORS.
