@@ -31,15 +31,19 @@ const DURACAO_TOAST_MS = 5000;
 const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 
 // The email backend only runs on Vercel (it needs a Node.js runtime, which
-// a static host like AWS S3/CloudFront can't provide), so the form always
+// a static host like AWS S3/CloudFront can't provide), so production always
 // calls this absolute URL — whether this build itself ends up served from
 // Vercel or from a static host, the request lands on the same place.
 // catec-tau (the catec-solucoes org's Vercel project) is the one actively
 // kept up to date; the original catec.vercel.app project isn't part of
 // this deploy flow right now.
-// While running `ng serve` it targets the local API (`npm run api`) so the form
-// can be tested without deploying.
-const API_BASE_URL = isDevMode() ? 'http://localhost:3557' : 'https://catec-tau.vercel.app';
+// While running `ng serve`, a relative path is used instead so the request goes
+// through the dev server's own proxy (see proxy.conf.json), which forwards it
+// server-to-server to the local API (`sh scripts/dev-with-env.sh`, port 3557).
+// That keeps testing working from any device that can reach ng serve's port
+// (e.g. a phone via Chrome's remote-debugging port forwarding) without also
+// needing port 3557 reachable or open to CORS.
+const API_BASE_URL = isDevMode() ? '' : 'https://catec-tau.vercel.app';
 
 // Quote request modal: form, validation and submission via the /api/send-email backend.
 @Component({

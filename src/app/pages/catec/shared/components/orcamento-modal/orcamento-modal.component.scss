@@ -9,6 +9,12 @@
   padding: 24px;
   z-index: 10000; // above the floating WhatsApp button (z-index: 9999)
   animation: fade-in 0.2s ease;
+
+  // Narrower margin around the dialog on small screens, so the form itself
+  // gets more of the limited screen width instead of losing it to the overlay.
+  @media (max-width: 576px) {
+    padding: 10px;
+  }
 }
 
 .orcamento-dialog {
@@ -104,7 +110,7 @@
   z-index: 1;
 
   @media (max-width: 576px) {
-    padding: 24px 20px 16px 20px;
+    padding: 24px 16px 16px 16px;
   }
 }
 
@@ -148,7 +154,7 @@
   padding: 8px 32px 32px 32px;
 
   @media (max-width: 576px) {
-    padding: 8px 20px 24px 20px;
+    padding: 8px 16px 24px 16px;
   }
 }
 
