@@ -5,7 +5,7 @@ const {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  urlDaLogo,
+  anexoLogoInline,
 } = require('./_lib/mailer');
 
 module.exports = async function handler(req, res) {
@@ -61,8 +61,13 @@ module.exports = async function handler(req, res) {
       description,
     };
 
+    // Computed before the logo is added below, so it only reflects what the
+    // visitor actually attached (the logo isn't a real attachment to them).
+    const temAnexo = attachments.length > 0;
+    const logoCid = 'logo-catec-email';
+
     const html = montarEmailHtml({
-      logoUrl: urlDaLogo('logo-catec-email.png'),
+      logoCid,
       logoAlt: 'CATEC Soluções',
       logoLargura: 140,
       logoAltura: 53,
@@ -74,7 +79,7 @@ module.exports = async function handler(req, res) {
       subtitulo: 'Nova solicitação recebida pelo site',
       siteUrl: 'https://catecsolucoes.com.br',
       campos,
-      temAnexo: attachments.length > 0,
+      temAnexo,
     });
 
     await enviarEmail({
@@ -84,7 +89,7 @@ module.exports = async function handler(req, res) {
       subject: `Nova solicitação recebida pelo site - ${name}`,
       text: montarTextoPlano(campos),
       html,
-      attachments,
+      attachments: [...attachments, anexoLogoInline('logo-catec-email.png', logoCid)],
     });
 
     return res.status(200).json({ success: true });

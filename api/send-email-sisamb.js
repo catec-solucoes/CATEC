@@ -5,7 +5,7 @@ const {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  urlDaLogo,
+  anexoLogoInline,
 } = require('./_lib/mailer');
 
 module.exports = async function handler(req, res) {
@@ -61,8 +61,11 @@ module.exports = async function handler(req, res) {
       description,
     };
 
+    const temAnexo = attachments.length > 0;
+    const logoCid = 'logo-sisamb-email';
+
     const html = montarEmailHtml({
-      logoUrl: urlDaLogo('logo-sisamb-email.png'),
+      logoCid,
       logoAlt: 'SISAMB',
       logoLargura: 140,
       logoAltura: 47,
@@ -72,7 +75,7 @@ module.exports = async function handler(req, res) {
       subtitulo: 'Novo agendamento recebido pelo site',
       siteUrl: 'https://sisamb.eco',
       campos,
-      temAnexo: attachments.length > 0,
+      temAnexo,
     });
 
     await enviarEmail({
@@ -82,7 +85,7 @@ module.exports = async function handler(req, res) {
       subject: `Novo agendamento SISAMB - ${name}`,
       text: montarTextoPlano(campos),
       html,
-      attachments,
+      attachments: [...attachments, anexoLogoInline('logo-sisamb-email.png', logoCid)],
     });
 
     return res.status(200).json({ success: true });

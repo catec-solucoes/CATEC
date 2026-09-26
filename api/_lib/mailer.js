@@ -3,18 +3,34 @@ const { google } = require('googleapis');
 
 const OAuth2 = google.auth.OAuth2;
 
-// The email logos are PNGs from the site's public/images/ folder. They have to
-// be PNG (WebP doesn't render in many mail clients) and referenced by absolute
-// HTTPS URL: Gmail blocks data: URIs, and cid: attachments broke for recipients
-// on other mail hosts. The URL uses the production domain rather than a
-// *.vercel.app one so it keeps working wherever the site and this API are
-// hosted (Vercel today, AWS later). Bump the version whenever a logo file
-// changes so mail proxies don't keep serving a cached (or cached-as-missing) copy.
-const LOGOS_BASE_URL = 'https://catecsolucoes.com.br/images';
-const VERSAO_LOGOS = 3;
+// The email logos are PNGs (WebP doesn't render in many mail clients),
+// embedded as inline (cid:) attachments instead of linked by URL. An
+// external URL depends on whatever is currently serving public/images/ -
+// Vercel today, AWS later, possibly something else after that - and Gmail
+// also blocks data: URIs outright. A cid: attachment carries the image
+// bytes inside the e-mail itself, so it renders the same regardless of
+// where (or whether) the site is deployed at the moment the e-mail is read.
+// Each logo's base64 lives in its own module under ./logos - a genuine code
+// dependency, not a static file a deploy step has to remember to bundle.
+const LOGOS_BASE64 = {
+  'logo-catec-email.png': require('./logos/catec'),
+  'logo-sisamb-email.png': require('./logos/sisamb'),
+  'logo-gestao-una-email.png': require('./logos/gestao'),
+};
 
-function urlDaLogo(nomeArquivo) {
-  return `${LOGOS_BASE_URL}/${nomeArquivo}?v=${VERSAO_LOGOS}`;
+// Builds the { filename, content, encoding, contentType, cid } attachment
+// nodemailer needs to embed one of the logos above inline. `cid` is what
+// the HTML's `src="cid:..."` must match.
+function anexoLogoInline(nomeArquivo, cid) {
+  const base64 = LOGOS_BASE64[nomeArquivo];
+  if (!base64) throw new Error(`Logo desconhecida: ${nomeArquivo}`);
+  return {
+    filename: nomeArquivo,
+    content: base64,
+    encoding: 'base64',
+    contentType: 'image/png',
+    cid,
+  };
 }
 
 // Lets this API be called cross-origin — the site is meant to work whether
@@ -231,7 +247,7 @@ function montarTextoPlano(campos) {
 // field handling and attachment/footer notes stay identical so a fix here
 // applies everywhere at once.
 function montarEmailHtml({
-  logoUrl,
+  logoCid,
   logoAlt,
   logoLargura,
   logoAltura,
@@ -261,7 +277,7 @@ function montarEmailHtml({
     <div style="max-width: 520px; margin: 0 auto; font-family: -apple-system, Segoe UI, Roboto, Arial, sans-serif; border: 1px solid #e2e2e2; border-radius: 12px; overflow: hidden;">
       <div style="${estiloTopo} padding: 20px 24px;">
         <img
-          src="${logoUrl}"
+          src="cid:${logoCid}"
           alt="${escapeHtml(logoAlt)}"
           width="${logoLargura}"
           height="${logoAltura}"
@@ -327,5 +343,5 @@ module.exports = {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  urlDaLogo,
+  anexoLogoInline,
 };
