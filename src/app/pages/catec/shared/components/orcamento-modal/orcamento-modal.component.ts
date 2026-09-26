@@ -12,6 +12,9 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { MarcaOrcamento, OrcamentoService } from './orcamento.service';
 import {
+  faixaHorarioDoDia,
+  isDiaUtil,
+  isHorarioValido,
   isTodayOrFuture,
   isValidCnpj,
   isValidCpf,
@@ -329,10 +332,15 @@ export class OrcamentoModalComponent {
     return isValidEmail(this.email);
   }
 
-  // The preferred date must be filled in and can't be in the past.
+  // The preferred date must be filled in, can't be in the past, and can't be
+  // a Sunday (the business doesn't attend that day).
   // The native `min` only limits the picker; a typed or pasted date bypasses it.
   get dataValida(): boolean {
-    return !!this.dataPreferida && isTodayOrFuture(this.dataPreferida);
+    return (
+      !!this.dataPreferida &&
+      isTodayOrFuture(this.dataPreferida) &&
+      isDiaUtil(this.dataPreferida)
+    );
   }
 
   // True when the phone field has enough digits.
@@ -340,9 +348,23 @@ export class OrcamentoModalComponent {
     return this.telefone.replace(/\D/g, '').length >= 10;
   }
 
-  // True when the preferred time field is filled in.
+  // The earliest bookable time for the selected date (08:00 every attended
+  // day) — used as the time input's `min`. Defaults to weekday hours before
+  // a date is chosen.
+  get horarioMin(): string {
+    return faixaHorarioDoDia(this.dataPreferida)?.min ?? '08:00';
+  }
+
+  // The latest bookable time for the selected date: 18:00 Monday-Friday,
+  // 12:00 Saturday — used as the time input's `max`.
+  get horarioMax(): string {
+    return faixaHorarioDoDia(this.dataPreferida)?.max ?? '18:00';
+  }
+
+  // True when the preferred time is within attendance hours for the
+  // selected date (Monday-Friday 8h-18h, Saturday 8h-12h).
   get horaValida(): boolean {
-    return this.horaPreferida.trim().length > 0;
+    return isHorarioValido(this.horaPreferida, this.dataPreferida);
   }
 
   // True when the case description has enough characters to be meaningful.

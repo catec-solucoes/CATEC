@@ -145,7 +145,7 @@
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)" (blur)="tocar('data')" (change)="tocar('data')" />
               </div>
               @if (mostrarErro('data', !dataValida)) {
-              <span class="field-error">Escolha uma data de hoje em diante.</span>
+              <span class="field-error">Escolha uma data de hoje em diante, de segunda a sábado.</span>
               }
             </div>
 
@@ -153,11 +153,14 @@
               <label [for]="campoId('hora')">Horário *</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
-                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" required [(ngModel)]="horaPreferida"
+                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" required
+                  [min]="horarioMin" [max]="horarioMax" [(ngModel)]="horaPreferida"
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('hora', !horaValida)" (blur)="tocar('hora')" (change)="tocar('hora')" />
               </div>
               @if (mostrarErro('hora', !horaValida)) {
-              <span class="field-error">Escolha um horário.</span>
+              <span class="field-error">Escolha um horário entre {{ horarioMin }} e {{ horarioMax }}.</span>
+              } @else {
+              <span class="field-hint">Seg. a sex. das 8h às 18h, sáb. das 8h às 12h.</span>
               }
             </div>
           </div>

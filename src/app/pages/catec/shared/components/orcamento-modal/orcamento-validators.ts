@@ -62,3 +62,36 @@ export function isTodayOrFuture(iso: string, agora: Date = new Date()): boolean 
     data.getFullYear() === ano && data.getMonth() === mes - 1 && data.getDate() === dia;
   return existe && iso >= todayIso(agora);
 }
+
+export interface FaixaHorario {
+  min: string;
+  max: string;
+}
+
+// Weekly attendance hours: Monday-Friday 8am-6pm, Saturday 8am-noon, closed Sundays.
+const HORARIO_SEMANA: FaixaHorario = { min: '08:00', max: '18:00' };
+const HORARIO_SABADO: FaixaHorario = { min: '08:00', max: '12:00' };
+
+// The bookable time range for an ISO date (YYYY-MM-DD): narrower on
+// Saturdays, null (nothing bookable) on Sundays or an invalid date.
+export function faixaHorarioDoDia(iso: string): FaixaHorario | null {
+  const partes = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!partes) return null;
+
+  const [, ano, mes, dia] = partes.map(Number);
+  const diaDaSemana = new Date(ano, mes - 1, dia).getDay();
+  if (diaDaSemana === 0) return null;
+  return diaDaSemana === 6 ? HORARIO_SABADO : HORARIO_SEMANA;
+}
+
+// True when the business attends on the given ISO date (i.e. not a Sunday).
+export function isDiaUtil(iso: string): boolean {
+  return faixaHorarioDoDia(iso) !== null;
+}
+
+// True when `hora` (HH:MM) falls within the bookable range for `dataIso`.
+export function isHorarioValido(hora: string, dataIso: string): boolean {
+  if (!/^\d{2}:\d{2}$/.test(hora)) return false;
+  const faixa = faixaHorarioDoDia(dataIso);
+  return faixa !== null && hora >= faixa.min && hora <= faixa.max;
+}

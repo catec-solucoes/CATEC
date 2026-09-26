@@ -140,17 +140,43 @@ function isTodayOrFuture(dataBr, agora = new Date()) {
   return existe && `${partes[3]}-${partes[2]}-${partes[1]}` >= hoje;
 }
 
+// Weekly attendance hours: Monday-Friday 8am-6pm, Saturday 8am-noon, closed Sundays.
+const HORARIO_SEMANA = { min: '08:00', max: '18:00' };
+const HORARIO_SABADO = { min: '08:00', max: '12:00' };
+
+// The bookable time range for a DD/MM/YYYY date: narrower on Saturdays,
+// null (nothing bookable) on Sundays or an invalid date.
+function faixaHorarioDoDia(dataBr) {
+  const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(dataBr || ''));
+  if (!partes) return null;
+
+  const [dia, mes, ano] = partes.slice(1).map(Number);
+  const diaDaSemana = new Date(Date.UTC(ano, mes - 1, dia)).getUTCDay();
+  if (diaDaSemana === 0) return null;
+  return diaDaSemana === 6 ? HORARIO_SABADO : HORARIO_SEMANA;
+}
+
 // Checks the fields that need more than "is present". Returns the error
 // message to send back with a 400, or null when everything is fine. The
-// document (CPF or CNPJ) and the preferred date are optional server-side,
-// but must be valid when provided.
-function erroDeValidacao({ email, document, preferredDate }) {
+// document (CPF or CNPJ), preferred date and preferred time are optional
+// server-side, but must be valid when provided.
+function erroDeValidacao({ email, document, preferredDate, preferredTime }) {
   if (!isValidEmail(email)) return 'Email inválido';
   if (document && !isValidCpf(document) && !isValidCnpj(document)) {
     return 'CPF ou CNPJ inválido';
   }
   if (preferredDate && !isTodayOrFuture(preferredDate)) {
     return 'A data preferida deve ser de hoje em diante';
+  }
+  if (preferredDate) {
+    const faixa = faixaHorarioDoDia(preferredDate);
+    if (!faixa) return 'Não atendemos aos domingos';
+    if (
+      preferredTime &&
+      !(/^\d{2}:\d{2}$/.test(preferredTime) && preferredTime >= faixa.min && preferredTime <= faixa.max)
+    ) {
+      return `Escolha um horário entre ${faixa.min} e ${faixa.max}`;
+    }
   }
   return null;
 }
