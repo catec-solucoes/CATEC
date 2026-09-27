@@ -5,7 +5,7 @@ const {
   montarTextoPlano,
   montarEmailHtml,
   aplicarCors,
-  anexoLogoInline,
+  urlDaLogo,
 } = require('./_lib/mailer');
 
 module.exports = async function handler(req, res) {
@@ -61,11 +61,8 @@ module.exports = async function handler(req, res) {
       description,
     };
 
-    const temAnexo = attachments.length > 0;
-    const logoCid = 'logo-gestao-una-email';
-
     const html = montarEmailHtml({
-      logoCid,
+      logoUrl: urlDaLogo('logo-gestao-una-email.png'),
       logoAlt: 'Gestão Una',
       logoLargura: 160,
       logoAltura: 32,
@@ -75,7 +72,7 @@ module.exports = async function handler(req, res) {
       subtitulo: 'Novo agendamento recebido pelo site',
       siteUrl: 'https://catecsolucoes.com.br/gestao-una',
       campos,
-      temAnexo,
+      temAnexo: attachments.length > 0,
     });
 
     await enviarEmail({
@@ -85,7 +82,7 @@ module.exports = async function handler(req, res) {
       subject: `Novo agendamento Gestão Una - ${name}`,
       text: montarTextoPlano(campos),
       html,
-      attachments: [...attachments, anexoLogoInline('logo-gestao-una-email.png', logoCid)],
+      attachments,
     });
 
     return res.status(200).json({ success: true });
