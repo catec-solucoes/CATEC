@@ -5,13 +5,17 @@ const OAuth2 = google.auth.OAuth2;
 
 // The email logos are PNGs from the site's public/images/ folder. They have to
 // be PNG (WebP doesn't render in many mail clients) and referenced by absolute
-// HTTPS URL: Gmail blocks data: URIs, and cid: attachments broke for recipients
-// on other mail hosts. The URL uses the production domain rather than a
+// HTTPS URL. Both alternatives were tried and ruled out: Gmail blocks data:
+// URIs outright, and Gmail's own web client doesn't reliably resolve cid:
+// inline attachments either (it re-serializes the message and orphans the
+// reference) - external URL is the one approach that actually renders for
+// Gmail recipients. The URL uses the production domain rather than a
 // *.vercel.app one so it keeps working wherever the site and this API are
-// hosted (Vercel today, AWS later). Bump the version whenever a logo file
-// changes so mail proxies don't keep serving a cached (or cached-as-missing) copy.
+// hosted, as long as this domain points somewhere that serves /images (S3+
+// CloudFront today). Bump the version whenever a logo file changes, or if a
+// mail proxy appears to be serving a cached-as-broken copy, so it re-fetches.
 const LOGOS_BASE_URL = 'https://catecsolucoes.com.br/images';
-const VERSAO_LOGOS = 3;
+const VERSAO_LOGOS = 4;
 
 function urlDaLogo(nomeArquivo) {
   return `${LOGOS_BASE_URL}/${nomeArquivo}?v=${VERSAO_LOGOS}`;
