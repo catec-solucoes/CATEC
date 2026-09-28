@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const erroValidacao = erroDeValidacao({ email, document, preferredDate });
+  const erroValidacao = erroDeValidacao({ email, document, preferredDate, preferredTime });
   if (erroValidacao) {
     return res.status(400).json({ error: erroValidacao });
   }

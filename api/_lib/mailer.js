@@ -5,13 +5,17 @@ const OAuth2 = google.auth.OAuth2;
 
 // The email logos are PNGs from the site's public/images/ folder. They have to
 // be PNG (WebP doesn't render in many mail clients) and referenced by absolute
-// HTTPS URL: Gmail blocks data: URIs, and cid: attachments broke for recipients
-// on other mail hosts. The URL uses the production domain rather than a
+// HTTPS URL. Both alternatives were tried and ruled out: Gmail blocks data:
+// URIs outright, and Gmail's own web client doesn't reliably resolve cid:
+// inline attachments either (it re-serializes the message and orphans the
+// reference) - external URL is the one approach that actually renders for
+// Gmail recipients. The URL uses the production domain rather than a
 // *.vercel.app one so it keeps working wherever the site and this API are
-// hosted (Vercel today, AWS later). Bump the version whenever a logo file
-// changes so mail proxies don't keep serving a cached (or cached-as-missing) copy.
+// hosted, as long as this domain points somewhere that serves /images (S3+
+// CloudFront today). Bump the version whenever a logo file changes, or if a
+// mail proxy appears to be serving a cached-as-broken copy, so it re-fetches.
 const LOGOS_BASE_URL = 'https://catecsolucoes.com.br/images';
-const VERSAO_LOGOS = 3;
+const VERSAO_LOGOS = 4;
 
 function urlDaLogo(nomeArquivo) {
   return `${LOGOS_BASE_URL}/${nomeArquivo}?v=${VERSAO_LOGOS}`;
@@ -140,17 +144,116 @@ function isTodayOrFuture(dataBr, agora = new Date()) {
   return existe && `${partes[3]}-${partes[2]}-${partes[1]}` >= hoje;
 }
 
+// Weekly attendance hours: Monday-Friday 8am-6pm. Closed on weekends and
+// national holidays.
+const HORARIO_SEMANA = { min: '08:00', max: '18:00' };
+
+// Fixed-date Brazilian national holidays (month/day, 1-indexed).
+const FERIADOS_FIXOS = [
+  [1, 1], // Confraternização Universal
+  [4, 21], // Tiradentes
+  [5, 1], // Dia do Trabalho
+  [9, 7], // Independência
+  [10, 12], // Nossa Senhora Aparecida
+  [11, 2], // Finados
+  [11, 15], // Proclamação da República
+  [11, 20], // Consciência Negra
+  [12, 25], // Natal
+];
+
+// Easter Sunday (Gregorian calendar, UTC) for a given year, via the standard
+// "anonymous Gregorian algorithm" — needed because Carnaval, Sexta-feira
+// Santa and Corpus Christi are all anchored to it and move every year.
+function domingoDePascoa(ano) {
+  const a = ano % 19;
+  const b = Math.floor(ano / 100);
+  const c = ano % 100;
+  const d = Math.floor(b / 4);
+  const e = b % 4;
+  const f = Math.floor((b + 8) / 25);
+  const g = Math.floor((b - f + 1) / 3);
+  const h = (19 * a + b - d - g + 15) % 30;
+  const i = Math.floor(c / 4);
+  const k = c % 4;
+  const l = (32 + 2 * e + 2 * i - h - k) % 7;
+  const m = Math.floor((a + 11 * h + 22 * l) / 451);
+  const mes = Math.floor((h + l - 7 * m + 114) / 31);
+  const dia = ((h + l - 7 * m + 114) % 31) + 1;
+  return new Date(Date.UTC(ano, mes - 1, dia));
+}
+
+function somarDias(data, dias) {
+  const resultado = new Date(data);
+  resultado.setUTCDate(resultado.getUTCDate() + dias);
+  return resultado;
+}
+
+function paraIso(data) {
+  const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+  const dia = String(data.getUTCDate()).padStart(2, '0');
+  return `${data.getUTCFullYear()}-${mes}-${dia}`;
+}
+
+// All national holidays for one calendar year, as a set of ISO dates: the
+// fixed-date ones plus the Easter-anchored ones (Carnaval is 2 days).
+function feriadosDoAno(ano) {
+  const pascoa = domingoDePascoa(ano);
+  const datas = [
+    ...FERIADOS_FIXOS.map(([mes, dia]) => new Date(Date.UTC(ano, mes - 1, dia))),
+    somarDias(pascoa, -47), // Segunda-feira de Carnaval
+    somarDias(pascoa, -46), // Terça-feira de Carnaval
+    somarDias(pascoa, -2), // Sexta-feira Santa
+    somarDias(pascoa, 60), // Corpus Christi
+  ];
+  return new Set(datas.map(paraIso));
+}
+
+// Cached per year: the form submits repeatedly for dates that mostly fall
+// in the same one or two calendar years.
+const cacheFeriados = new Map();
+
+function isFeriado(iso, ano) {
+  if (!cacheFeriados.has(ano)) {
+    cacheFeriados.set(ano, feriadosDoAno(ano));
+  }
+  return cacheFeriados.get(ano).has(iso);
+}
+
+// The bookable time range for a DD/MM/YYYY date: null (nothing bookable)
+// on weekends, national holidays, or an invalid date.
+function faixaHorarioDoDia(dataBr) {
+  const partes = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(String(dataBr || ''));
+  if (!partes) return null;
+
+  const [dia, mes, ano] = partes.slice(1).map(Number);
+  const diaDaSemana = new Date(Date.UTC(ano, mes - 1, dia)).getUTCDay();
+  if (diaDaSemana === 0 || diaDaSemana === 6) return null;
+  const iso = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  if (isFeriado(iso, ano)) return null;
+  return HORARIO_SEMANA;
+}
+
 // Checks the fields that need more than "is present". Returns the error
 // message to send back with a 400, or null when everything is fine. The
-// document (CPF or CNPJ) and the preferred date are optional server-side,
-// but must be valid when provided.
-function erroDeValidacao({ email, document, preferredDate }) {
+// document (CPF or CNPJ), preferred date and preferred time are optional
+// server-side, but must be valid when provided.
+function erroDeValidacao({ email, document, preferredDate, preferredTime }) {
   if (!isValidEmail(email)) return 'Email inválido';
   if (document && !isValidCpf(document) && !isValidCnpj(document)) {
     return 'CPF ou CNPJ inválido';
   }
   if (preferredDate && !isTodayOrFuture(preferredDate)) {
     return 'A data preferida deve ser de hoje em diante';
+  }
+  if (preferredDate) {
+    const faixa = faixaHorarioDoDia(preferredDate);
+    if (!faixa) return 'Não atendemos aos finais de semana e feriados';
+    if (
+      preferredTime &&
+      !(/^\d{2}:\d{2}$/.test(preferredTime) && preferredTime >= faixa.min && preferredTime <= faixa.max)
+    ) {
+      return `Escolha um horário entre ${faixa.min} e ${faixa.max}`;
+    }
   }
   return null;
 }

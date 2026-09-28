@@ -1,13 +1,13 @@
 .about-section {
   width: 100%;
   background: #fffefe;
-  padding: 30px 0 0;
+  padding: 48px 0;
   position: relative;
   overflow: hidden;
   scroll-margin-top: 80px;
 
   @media (max-width: 968px) {
-    padding: 30px 0 0;
+    padding: 32px 0;
     position: relative;
     overflow: hidden;
   }
@@ -72,7 +72,7 @@
 .about-features-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 24px;
 
   @media (max-width: 900px) {
     grid-template-columns: repeat(2, 1fr);

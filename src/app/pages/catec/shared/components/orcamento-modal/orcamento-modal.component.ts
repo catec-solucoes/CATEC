@@ -12,6 +12,9 @@ import { FormsModule } from '@angular/forms';
 import { ButtonComponent } from '../button/button.component';
 import { MarcaOrcamento, OrcamentoService } from './orcamento.service';
 import {
+  faixaHorarioDoDia,
+  isDiaUtil,
+  isHorarioValido,
   isTodayOrFuture,
   isValidCnpj,
   isValidCpf,
@@ -31,15 +34,20 @@ const DURACAO_TOAST_MS = 5000;
 const TAMANHO_MAX_ANEXO_BYTES = 3 * 1024 * 1024;
 
 // The email backend only runs on Vercel (it needs a Node.js runtime, which
-// a static host like AWS S3/CloudFront can't provide), so the form always
+// a static host like AWS S3/CloudFront can't provide), so production always
 // calls this absolute URL — whether this build itself ends up served from
 // Vercel or from a static host, the request lands on the same place.
 // catec-tau (the catec-solucoes org's Vercel project) is the one actively
 // kept up to date; the original catec.vercel.app project isn't part of
 // this deploy flow right now.
-// While running `ng serve` it targets the local API (`npm run api`) so the form
-// can be tested without deploying.
-const API_BASE_URL = isDevMode() ? 'http://localhost:3557' : 'https://catec-tau.vercel.app';
+// While running `ng serve`, a relative path is used instead so the request goes
+// through the dev server's own proxy (see proxy.conf.json), which forwards it
+// server-to-server to the local API (`npm run api`, port 3557 — a plain Node
+// server that serves the same /api handlers without needing a Vercel login).
+// That keeps testing working from any device that can reach ng serve's port
+// (e.g. a phone via Chrome's remote-debugging port forwarding) without also
+// needing port 3557 reachable or open to CORS.
+const API_BASE_URL = isDevMode() ? '' : 'https://catec-tau.vercel.app';
 
 // Quote request modal: form, validation and submission via the /api/send-email backend.
 @Component({
@@ -332,12 +340,34 @@ export class OrcamentoModalComponent {
   // The preferred date is optional, but when filled it can't be in the past.
   // The native `min` only limits the picker; a typed or pasted date bypasses it.
   get dataValida(): boolean {
-    return !this.dataPreferida || isTodayOrFuture(this.dataPreferida);
+    return (
+      !!this.dataPreferida &&
+      isTodayOrFuture(this.dataPreferida) &&
+      isDiaUtil(this.dataPreferida)
+    );
   }
 
   // True when the phone field has enough digits.
   get telefoneValido(): boolean {
     return this.telefone.replace(/\D/g, '').length >= 10;
+  }
+
+  // The earliest bookable time for the selected date (08:00 every attended
+  // day) — used as the time input's `min`. Defaults to weekday hours before
+  // a date is chosen.
+  get horarioMin(): string {
+    return faixaHorarioDoDia(this.dataPreferida)?.min ?? '08:00';
+  }
+
+  // The latest bookable time for the selected date: 18:00 Monday-Friday —
+  // used as the time input's `max`.
+  get horarioMax(): string {
+    return faixaHorarioDoDia(this.dataPreferida)?.max ?? '18:00';
+  }
+
+   // True when the case description has enough characters to be meaningful.
+  get descricaoValida(): boolean {
+    return this.descricao.trim().length > 3;
   }
 
   // True when all required fields pass validation.
@@ -348,7 +378,9 @@ export class OrcamentoModalComponent {
       this.enderecoValido &&
       this.emailValido &&
       this.telefoneValido &&
-      this.dataValida
+      this.dataValida &&
+      this.horaValida &&
+      this.descricaoValida
     );
   }
 

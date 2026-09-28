@@ -13,13 +13,14 @@
           <p class="orcamento-subtitle">
             Preencha os dados abaixo e entraremos em contato o quanto antes.
           </p>
+          <p class="orcamento-campos-obrigatorios">* Campos obrigatórios</p>
         </div>
         <button type="button" class="orcamento-close" (click)="fechar()" aria-label="Fechar">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </header>
 
-      <form #orcamentoForm class="orcamento-form" (ngSubmit)="enviar()">
+      <form #orcamentoForm class="orcamento-form" novalidate (ngSubmit)="enviar()">
         <!-- SECTION: IDENTIFICATION -->
         <section class="form-section">
           <h4 class="form-section-title">
@@ -43,15 +44,14 @@
           <div class="form-row">
             <div class="form-field">
               <label [for]="campoId('nome')">
-                {{ tipoPessoa() === 'fisica' ? 'Nome Completo' : 'Razão Social' }}
+                {{ tipoPessoa() === 'fisica' ? 'Nome Completo' : 'Razão Social' }} *
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">
                   {{ tipoPessoa() === 'fisica' ? 'person_outline' : 'storefront' }}
                 </i>
-                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('nome', !nomeValido)"
-                  (blur)="tocar('nome')" />
+                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" required [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
+                  [class.invalid]="mostrarErro('nome', !nomeValido)" (blur)="tocar('nome')" />
               </div>
               @if (mostrarErro('nome', !nomeValido)) {
               <span class="field-error">Informe o nome.</span>
@@ -60,11 +60,11 @@
 
             <div class="form-field">
               <label [for]="campoId('documento')">
-                {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }}
+                {{ tipoPessoa() === 'fisica' ? 'CPF' : 'CNPJ' }} *
               </label>
               <div class="input-with-icon">
                 <i class="material-icons">fingerprint</i>
-                <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric"
+                <input [id]="campoId('documento')" [name]="campoId('documento')" type="text" inputmode="numeric" required
                   [placeholder]="tipoPessoa() === 'fisica' ? '000.000.000-00' : '00.000.000/0000-00'"
                   [maxlength]="tipoPessoa() === 'fisica' ? 14 : 18" [(ngModel)]="documento"
                   [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('documento', !documentoValido)"
@@ -82,8 +82,8 @@
             <label [for]="campoId('endereco')">Endereço *</label>
             <div class="input-with-icon">
               <i class="material-icons">location_on</i>
-              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text"
-                placeholder="Rua, número, bairro, cidade" [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
+              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" required placeholder="Rua, número, bairro, cidade"
+                [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
                 [class.invalid]="mostrarErro('endereco', !enderecoValido)" (blur)="tocar('endereco')" />
             </div>
             @if (mostrarErro('endereco', !enderecoValido)) {
@@ -101,12 +101,11 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label [for]="campoId('email')">E-mail</label>
+              <label [for]="campoId('email')">E-mail *</label>
               <div class="input-with-icon">
                 <i class="material-icons">mail_outline</i>
-                <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('email', !emailValido)"
-                  (blur)="tocar('email')" />
+                <input [id]="campoId('email')" [name]="campoId('email')" type="email" required [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
+                  [class.invalid]="mostrarErro('email', !emailValido)" (blur)="tocar('email')" />
               </div>
               @if (mostrarErro('email', !emailValido)) {
               <span class="field-error">Informe um e-mail válido.</span>
@@ -114,13 +113,13 @@
             </div>
 
             <div class="form-field">
-              <label [for]="campoId('telefone')">Telefone</label>
+              <label [for]="campoId('telefone')">Telefone *</label>
               <div class="input-with-icon">
                 <i class="material-icons">call</i>
-                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric"
-                  placeholder="(00) 00000-0000" maxlength="15" [(ngModel)]="telefone"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('telefone', !telefoneValido)"
-                  (input)="onTelefoneInput($event)" (blur)="tocar('telefone')" />
+                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" required placeholder="(00) 00000-0000"
+                  maxlength="15" [(ngModel)]="telefone" [ngModelOptions]="{ standalone: true }"
+                  [class.invalid]="mostrarErro('telefone', !telefoneValido)" (input)="onTelefoneInput($event)"
+                  (blur)="tocar('telefone')" />
               </div>
               @if (mostrarErro('telefone', !telefoneValido)) {
               <span class="field-error">Informe um telefone válido.</span>
@@ -138,29 +137,31 @@
 
           <div class="form-row">
             <div class="form-field">
-              <label [for]="campoId('data')">Data preferida</label>
+              <label [for]="campoId('data')">Data preferida *</label>
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
-                <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)"
-                  (blur)="tocar('data')" (change)="tocar('data')" />
+                <input [id]="campoId('data')" type="date" required [min]="dataMinima" [(ngModel)]="dataPreferida"
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)" (blur)="tocar('data')" (change)="tocar('data')" />
               </div>
               @if (mostrarErro('data', !dataValida)) {
-              <span class="field-error">Escolha uma data de hoje em diante.</span>
+              <span class="field-error">Escolha um dia útil (segunda a sexta), sem feriados.</span>
               }
             </div>
 
             <div class="form-field">
-              <label [for]="campoId('hora')">Horário</label>
+              <label [for]="campoId('hora')">Horário *</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
                 <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" max="18:00"
                   [(ngModel)]="horaPreferida" [ngModelOptions]="{ standalone: true }" (blur)="tocar('horaPreferida')" />
               </div>
-              <div *ngIf="mostrarErro('horaPreferida', !horaValida)" class="erro-mensagem">
-                O horário máximo de atendimento é até às 18:00.
-              </div>
+              @if (mostrarErro('hora', !horaValida)) {
+              <span class="field-error">Escolha um horário entre {{ horarioMin }} e {{ horarioMax }}.</span>
+              } @else {
+              <span class="field-hint">Seg. a sex. das 8h às 18h.</span>
+              }
             </div>
+          </div>
         </section>
 
         <!-- SECTION: DETAILS -->
@@ -171,10 +172,14 @@
           </h4>
 
           <div class="form-field">
-            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso</label>
-            <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800"
+            <label [for]="campoId('descricao')">Conte um pouco sobre o seu caso *</label>
+            <textarea [id]="campoId('descricao')" [name]="campoId('descricao')" rows="4" maxlength="800" required
               placeholder="Descreva o que você precisa..." [(ngModel)]="descricao"
-              [ngModelOptions]="{ standalone: true }"></textarea>
+              [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('descricao', !descricaoValida)"
+              (blur)="tocar('descricao')"></textarea>
+            @if (mostrarErro('descricao', !descricaoValida)) {
+            <span class="field-error">Conte um pouco sobre o que você precisa.</span>
+            }
           </div>
         </section>
 
