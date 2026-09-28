@@ -2,8 +2,7 @@
 @if (isOpen()) {
 <div class="orcamento-overlay" (click)="fechar()">
   <div class="orcamento-dialog" [class.orcamento-dialog--sisamb]="marca() === 'sisamb'"
-    [class.orcamento-dialog--gestao]="marca() === 'gestao'"
-    (click)="$event.stopPropagation()">
+    [class.orcamento-dialog--gestao]="marca() === 'gestao'" (click)="$event.stopPropagation()">
     <div class="orcamento-scroll">
       <header class="orcamento-header">
         <div class="orcamento-header-icon">
@@ -50,8 +49,9 @@
                 <i class="material-icons">
                   {{ tipoPessoa() === 'fisica' ? 'person_outline' : 'storefront' }}
                 </i>
-                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="mostrarErro('nome', !nomeValido)" (blur)="tocar('nome')" />
+                <input [id]="campoId('nome')" [name]="campoId('nome')" type="text" [(ngModel)]="nome"
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('nome', !nomeValido)"
+                  (blur)="tocar('nome')" />
               </div>
               @if (mostrarErro('nome', !nomeValido)) {
               <span class="field-error">Informe o nome.</span>
@@ -82,8 +82,8 @@
             <label [for]="campoId('endereco')">Endereço *</label>
             <div class="input-with-icon">
               <i class="material-icons">location_on</i>
-              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text" placeholder="Rua, número, bairro, cidade"
-                [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
+              <input [id]="campoId('endereco')" [name]="campoId('endereco')" type="text"
+                placeholder="Rua, número, bairro, cidade" [(ngModel)]="endereco" [ngModelOptions]="{ standalone: true }"
                 [class.invalid]="mostrarErro('endereco', !enderecoValido)" (blur)="tocar('endereco')" />
             </div>
             @if (mostrarErro('endereco', !enderecoValido)) {
@@ -104,8 +104,9 @@
               <label [for]="campoId('email')">E-mail</label>
               <div class="input-with-icon">
                 <i class="material-icons">mail_outline</i>
-                <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="mostrarErro('email', !emailValido)" (blur)="tocar('email')" />
+                <input [id]="campoId('email')" [name]="campoId('email')" type="email" [(ngModel)]="email"
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('email', !emailValido)"
+                  (blur)="tocar('email')" />
               </div>
               @if (mostrarErro('email', !emailValido)) {
               <span class="field-error">Informe um e-mail válido.</span>
@@ -116,10 +117,10 @@
               <label [for]="campoId('telefone')">Telefone</label>
               <div class="input-with-icon">
                 <i class="material-icons">call</i>
-                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric" placeholder="(00) 00000-0000"
-                  maxlength="15" [(ngModel)]="telefone" [ngModelOptions]="{ standalone: true }"
-                  [class.invalid]="mostrarErro('telefone', !telefoneValido)" (input)="onTelefoneInput($event)"
-                  (blur)="tocar('telefone')" />
+                <input [id]="campoId('telefone')" [name]="campoId('telefone')" type="tel" inputmode="numeric"
+                  placeholder="(00) 00000-0000" maxlength="15" [(ngModel)]="telefone"
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('telefone', !telefoneValido)"
+                  (input)="onTelefoneInput($event)" (blur)="tocar('telefone')" />
               </div>
               @if (mostrarErro('telefone', !telefoneValido)) {
               <span class="field-error">Informe um telefone válido.</span>
@@ -141,7 +142,8 @@
               <div class="input-with-icon">
                 <i class="material-icons">calendar_today</i>
                 <input [id]="campoId('data')" type="date" [min]="dataMinima" [(ngModel)]="dataPreferida"
-                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)" (blur)="tocar('data')" (change)="tocar('data')" />
+                  [ngModelOptions]="{ standalone: true }" [class.invalid]="mostrarErro('data', !dataValida)"
+                  (blur)="tocar('data')" (change)="tocar('data')" />
               </div>
               @if (mostrarErro('data', !dataValida)) {
               <span class="field-error">Escolha uma data de hoje em diante.</span>
@@ -152,11 +154,13 @@
               <label [for]="campoId('hora')">Horário</label>
               <div class="input-with-icon">
                 <i class="material-icons">schedule</i>
-                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" [(ngModel)]="horaPreferida"
-                  [ngModelOptions]="{ standalone: true }" />
+                <input [id]="campoId('hora')" [name]="campoId('hora_preferida')" type="time" max="18:00"
+                  [(ngModel)]="horaPreferida" [ngModelOptions]="{ standalone: true }" (blur)="tocar('horaPreferida')" />
+              </div>
+              <div *ngIf="mostrarErro('horaPreferida', !horaValida)" class="erro-mensagem">
+                O horário máximo de atendimento é até às 18:00.
               </div>
             </div>
-          </div>
         </section>
 
         <!-- SECTION: DETAILS -->
@@ -186,7 +190,8 @@
               <label [for]="campoId('imagem')">Imagem</label>
               <div class="file-field">
                 <i class="material-icons">image</i>
-                <input [id]="campoId('imagem')" type="file" accept="image/*" (change)="onArquivoSelecionado($event, 'imagem')" />
+                <input [id]="campoId('imagem')" type="file" accept="image/*"
+                  (change)="onArquivoSelecionado($event, 'imagem')" />
               </div>
               @if (imagemErro()) {
               <span class="field-error">{{ imagemErro() }}</span>

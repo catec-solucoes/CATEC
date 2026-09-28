@@ -324,6 +324,11 @@ export class OrcamentoModalComponent {
     return isValidEmail(this.email);
   }
 
+  // True when the preferred time is empty or at most 18:00.
+  get horaValida(): boolean {
+    return !this.horaPreferida || this.horaPreferida <= '18:00';
+  }
+
   // The preferred date is optional, but when filled it can't be in the past.
   // The native `min` only limits the picker; a typed or pasted date bypasses it.
   get dataValida(): boolean {
